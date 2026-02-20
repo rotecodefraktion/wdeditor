@@ -1,0 +1,16 @@
+/requirements Ich möchte eine App bauen die ein Tool zum intergrientern Bauen von Konfigurationsdateien für SAP Webdipatcher für Administratoren.
+Es sollen primär in das Instanzprofil neue Webdispatcher Ports eingetragen werden können auf die der Webdispatcher lauscht, gepflegt werden und
+in der rules.txt die Datei rewrite rules.
+
+Beide Dateien und sollen syntaktisch gepflegt werden können und auf eindeutigkeit der Ports.
+In einer settings datei sollen die zu pflegenden Dateinamen gepflegt werden können und das Github repository. Ein commit soll nur in einem Dev Zweig möglich sein.
+
+User sollen sich registrieren und nach einer Genehmigung und einloggen können mit:
+
+- Email + Passwort
+- Github
+
+Außerdem brauche ich Passwort-Reset Funktionalität.
+
+User müssen einen gültigen Github Account für das Repository haben.
+Für Testzwecke für die Konfig files kannst Du ein öffentliches Reposistory initial anlegen.
