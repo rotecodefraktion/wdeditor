@@ -3,6 +3,7 @@
 > Central tracking for all features. Updated by skills automatically.
 
 ## Status Legend
+
 - **Planned** - Requirements written, ready for development
 - **In Progress** - Currently being built
 - **In Review** - QA testing in progress
@@ -11,8 +12,31 @@
 ## Features
 
 | ID | Feature | Status | Spec | Created |
-|----|---------|--------|------|---------|
+| -- | ------- | ------ | ---- | ------- |
+| PROJ-1 | User Registration & Approval Workflow | In Review | [PROJ-1-user-registration-approval.md](PROJ-1-user-registration-approval.md) | 2026-02-20 |
+| PROJ-2 | User Authentication (Email+PW, GitHub OAuth, Password Reset) | In Review | [PROJ-2-user-authentication.md](PROJ-2-user-authentication.md) | 2026-02-20 |
+| PROJ-3 | Admin User Management Dashboard | In Review | [PROJ-3-admin-user-management.md](PROJ-3-admin-user-management.md) | 2026-02-20 |
+| PROJ-4 | Global Settings (GitHub Repo, Dateipfade, Dev Branch) | Planned | [PROJ-4-global-settings.md](PROJ-4-global-settings.md) | 2026-02-20 |
+| PROJ-5 | Instance Profile Port Editor (inkl. Pessimistic Locking) | Planned | [PROJ-5-instance-profile-port-editor.md](PROJ-5-instance-profile-port-editor.md) | 2026-02-20 |
+| PROJ-6 | Rules.txt Rewrite Rule Editor (inkl. Pessimistic Locking) | Planned | [PROJ-6-rules-rewrite-editor.md](PROJ-6-rules-rewrite-editor.md) | 2026-02-20 |
+| PROJ-7 | GitHub Repository Integration (Lesen/Committen) | Planned | [PROJ-7-github-integration.md](PROJ-7-github-integration.md) | 2026-02-20 |
 
 <!-- Add features above this line -->
 
-## Next Available ID: PROJ-1
+## Next Available ID: PROJ-8
+
+## Build Order (Empfohlen)
+
+```text
+PROJ-1 → PROJ-2 → PROJ-3 → PROJ-4 → PROJ-7 → PROJ-5 → PROJ-6
+```
+
+| Schritt | Feature | Begründung |
+| ------- | ------- | ---------- |
+| 1 | PROJ-1: Registration | Basis: User-Modell und Approval-Flow zuerst |
+| 2 | PROJ-2: Authentication | Login baut auf Registration auf |
+| 3 | PROJ-3: Admin Dashboard | Braucht Auth + User-Modell |
+| 4 | PROJ-4: Settings | Braucht Auth + Admin-Rolle |
+| 5 | PROJ-7: GitHub Integration | Braucht Settings; wird von Editoren genutzt |
+| 6 | PROJ-5: Port Editor | Braucht Settings + GitHub Integration |
+| 7 | PROJ-6: Rules Editor | Braucht Settings + GitHub + Lock-Infrastruktur von PROJ-5 |

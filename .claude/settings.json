@@ -1,6 +1,8 @@
 {
   "permissions": {
     "allow": [
+      "Write",
+      "Edit",
       "Bash(npm install)",
       "Bash(npm install:*)",
       "Bash(npm run dev:*)",
