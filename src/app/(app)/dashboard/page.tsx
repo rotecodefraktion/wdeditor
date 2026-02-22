@@ -3,6 +3,8 @@ import { Badge } from '@/components/ui/badge'
 import { FileText, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { UnconfiguredBanner } from '@/components/settings/unconfigured-banner'
+import { createClient } from '@/lib/supabase/server'
 
 const features = [
   {
@@ -31,7 +33,20 @@ const features = [
   },
 ]
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  let userRole: string | undefined
+  if (user) {
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('role')
+      .eq('user_id', user.id)
+      .single()
+    userRole = profile?.role
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -40,6 +55,9 @@ export default function DashboardPage() {
           Welcome to the SAP Web Dispatcher configuration editor.
         </p>
       </div>
+
+      <UnconfiguredBanner userRole={userRole} />
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {features.map((feature) => {
           const Icon = feature.icon

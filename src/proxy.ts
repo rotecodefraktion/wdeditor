@@ -1,10 +1,12 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 const PUBLIC_PATHS = [
   '/login',
   '/register',
   '/auth',
+  '/reset-password',
 ]
 
 function isPublicPath(pathname: string): boolean {
@@ -30,7 +32,9 @@ export async function proxy(request: NextRequest) {
   }
 
   // User-Status aus user_profiles prüfen
-  const { data: profile } = await supabase
+  // Use admin client to bypass RLS (recursive policy on user_profiles causes infinite loop)
+  const adminClient = createAdminClient()
+  const { data: profile } = await adminClient
     .from('user_profiles')
     .select('status')
     .eq('user_id', user.id)
@@ -78,8 +82,8 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Alle Routen außer statischen Assets und Next.js Internals
+     * Alle Routen außer statischen Assets, Next.js Internals und API-Routen
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

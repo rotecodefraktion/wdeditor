@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@supabase/ssr'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse, type NextRequest } from 'next/server'
 import { z } from 'zod'
 import { checkRateLimit, incrementRateLimit } from '@/lib/rate-limit'
@@ -47,14 +48,44 @@ export async function POST(request: NextRequest) {
 
     const { email, password } = parsed.data
 
-    const supabase = await createClient()
+    // Collect cookies from signInWithPassword to apply to the response
+    const pendingCookies: { name: string; value: string; options: Record<string, unknown> }[] = []
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach((cookie) => pendingCookies.push(cookie))
+          },
+        },
+      }
+    )
 
     // Step 1: Attempt sign-in first to get user object
-    // signInWithPassword returns the user including user.id on success
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    let authData: Awaited<ReturnType<typeof supabase.auth.signInWithPassword>>['data']
+    let authError: Awaited<ReturnType<typeof supabase.auth.signInWithPassword>>['error']
+
+    try {
+      const result = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+      authData = result.data
+      authError = result.error
+    } catch {
+      // signInWithPassword can throw for network errors or unexpected responses
+      // Treat any thrown error as invalid credentials to avoid leaking info
+      incrementRateLimit(rateLimitKey, LOGIN_RATE_LIMIT)
+      return NextResponse.json(
+        { error: 'Invalid email or password.', code: 'invalid_credentials' },
+        { status: 401 }
+      )
+    }
 
     if (authError || !authData.session) {
       // Increment rate limit only on failed login (wrong credentials)
@@ -65,9 +96,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Step 2: Check user_profiles status using the authenticated user's ID
-    // No need for admin listUsers - we already have the user from signInWithPassword
-    const { data: profile } = await supabase
+    // Step 2: Check user_profiles status using admin client
+    const adminClient = createAdminClient()
+    const { data: profile } = await adminClient
       .from('user_profiles')
       .select('status')
       .eq('user_id', authData.user.id)
@@ -84,10 +115,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // User is active, session is already set via cookies by Supabase
-    // Do NOT increment rate limit on successful login
-    return NextResponse.json({ success: true })
-  } catch {
+    // User is active - create response and explicitly set session cookies
+    const response = NextResponse.json({ success: true })
+    pendingCookies.forEach(({ name, value, options }) => {
+      response.cookies.set(name, value, options as Record<string, string>)
+    })
+    return response
+  } catch (error) {
+    console.error('[POST /api/auth/login] Unhandled error:', error)
     return NextResponse.json(
       { error: 'Internal server error.', code: 'server_error' },
       { status: 500 }

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse, type NextRequest } from 'next/server'
 
 /**
@@ -44,7 +45,10 @@ export async function GET(request: NextRequest) {
   }
 
   // Profil laden und Status prüfen
-  const { data: profile } = await supabase
+  // Use admin client because session cookies are not yet available in the current request
+  // after exchangeCodeForSession (same issue as login route)
+  const adminClient = createAdminClient()
+  const { data: profile } = await adminClient
     .from('user_profiles')
     .select('status, github_username')
     .eq('user_id', user.id)
