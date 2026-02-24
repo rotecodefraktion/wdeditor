@@ -4,6 +4,7 @@ import { FileText, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { UnconfiguredBanner } from '@/components/settings/unconfigured-banner'
+import { GitHubAccessWarning } from '@/components/github/github-access-warning'
 import { createClient } from '@/lib/supabase/server'
 
 const features = [
@@ -57,6 +58,7 @@ export default async function DashboardPage() {
       </div>
 
       <UnconfiguredBanner userRole={userRole} />
+      <GitHubAccessWarning userRole={userRole} />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {features.map((feature) => {

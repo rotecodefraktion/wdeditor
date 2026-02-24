@@ -1,32 +1,12 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { decrypt } from '@/lib/encryption'
+import { githubHeaders, encodeGitHubPath } from '@/lib/github'
 import { checkRateLimit, incrementRateLimit } from '@/lib/rate-limit'
 import type { ConnectionCheckResult, ConnectionTestResponse } from '@/lib/settings-schema'
 
 /** Rate limit: max 5 test-connection requests per minute per user */
 const TEST_CONNECTION_RATE_LIMIT = { maxRequests: 5, windowMs: 60_000 }
-
-/** Standard GitHub API request headers */
-function githubHeaders(pat: string) {
-  return {
-    Authorization: `Bearer ${pat}`,
-    Accept: 'application/vnd.github+json',
-    'X-GitHub-Api-Version': '2022-11-28',
-  }
-}
-
-/**
- * Encode a file path for the GitHub Contents API.
- * Each path segment is individually URI-encoded so that `/` separators
- * are preserved while special characters within segments are escaped.
- */
-function encodeGitHubPath(filePath: string): string {
-  return filePath
-    .split('/')
-    .map((segment) => encodeURIComponent(segment))
-    .join('/')
-}
 
 /**
  * POST /api/settings/test-connection
