@@ -1,6 +1,6 @@
 # PROJ-6: Rules.txt Rewrite Rule Editor
 
-## Status: In Review
+## Status: Deployed
 
 **Created:** 2026-02-20
 **Last Updated:** 2026-02-20
