@@ -8,7 +8,13 @@
       "Bash(npm ls:*)",
       "Bash(curl:*)",
       "Bash(npx supabase:*)",
-      "Bash(git -C /Users/davidkrcek/development/consolut/wdeditor log --oneline -S \"CREATE TABLE\" -10)"
+      "Bash(git -C /Users/davidkrcek/development/consolut/wdeditor log --oneline -S \"CREATE TABLE\" -10)",
+      "Bash(npx tsx -e:*)",
+      "Bash(PORT=3002 npm run start:*)",
+      "Bash(git add:*)"
+    ],
+    "additionalDirectories": [
+      "/Users/davidkrcek/development/consolut/wdeditor/src/components"
     ]
   }
 }
