@@ -7,7 +7,8 @@
       "mcp__supabase__get_advisors",
       "Bash(npm ls:*)",
       "Bash(curl:*)",
-      "Bash(npx supabase:*)"
+      "Bash(npx supabase:*)",
+      "Bash(git -C /Users/davidkrcek/development/consolut/wdeditor log --oneline -S \"CREATE TABLE\" -10)"
     ]
   }
 }

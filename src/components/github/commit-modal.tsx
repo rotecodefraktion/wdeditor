@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Loader2, GitCommit, FilePlus, AlertTriangle } from 'lucide-react'
 import {
   Dialog,
@@ -31,6 +31,7 @@ interface CommitModalProps {
   currentSha: string
   fileType: FileType
   fileName?: string
+  defaultMessage?: string
   onCommitSuccess: (result: GitHubCommitResponse) => void
 }
 
@@ -42,10 +43,20 @@ export function CommitModal({
   currentSha,
   fileType,
   fileName,
+  defaultMessage,
   onCommitSuccess,
 }: CommitModalProps) {
-  const [commitMessage, setCommitMessage] = useState('')
+  const [commitMessage, setCommitMessage] = useState(defaultMessage ?? '')
   const [isCommitting, setIsCommitting] = useState(false)
+
+  // Reset commit message to defaultMessage when the modal opens
+  useEffect(() => {
+    if (open) {
+      setCommitMessage(defaultMessage ?? '')
+      setConflict(null)
+      setFileDeleted(false)
+    }
+  }, [open, defaultMessage])
   const [conflict, setConflict] = useState<GitHubConflictInfo | null>(null)
   const [fileDeleted, setFileDeleted] = useState(false)
 
@@ -218,11 +229,11 @@ export function CommitModal({
                 value={commitMessage}
                 onChange={(e) => setCommitMessage(e.target.value)}
                 rows={3}
-                maxLength={500}
+                maxLength={200}
                 disabled={isCommitting}
               />
               <p className="text-xs text-muted-foreground mt-1">
-                {commitMessage.length}/500 — Dein Name und E-Mail werden automatisch hinzugefügt.
+                {commitMessage.length}/200 — Dein Name und E-Mail werden automatisch hinzugefügt.
               </p>
             </div>
           )}

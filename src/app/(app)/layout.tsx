@@ -5,6 +5,7 @@ import { Separator } from '@/components/ui/separator'
 import { LogOut, Settings } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { MobileNav } from '@/components/mobile-nav'
 
 async function SignOutButton() {
   return (
@@ -42,12 +43,16 @@ export default async function AppLayout({
       <header className="border-b">
         <div className="container mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-6">
+            <MobileNav isAdmin={isAdmin} />
             <Link href="/dashboard" className="font-semibold text-sm">
               SAP Web Dispatcher Editor
             </Link>
             <nav className="hidden md:flex items-center gap-1">
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/dashboard">Dashboard</Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/editor/instance-profile">Port Editor</Link>
               </Button>
               {isAdmin && (
                 <>

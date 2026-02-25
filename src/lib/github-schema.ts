@@ -17,7 +17,7 @@ export const commitRequestSchema = z.object({
   commit_message: z
     .string()
     .min(1, 'Commit message is required.')
-    .max(500, 'Commit message is too long.'),
+    .max(200, 'Commit message is too long.'),
   file_type: fileTypeSchema,
   current_sha: z.string().optional().default(''),
   force: z.boolean().optional().default(false),

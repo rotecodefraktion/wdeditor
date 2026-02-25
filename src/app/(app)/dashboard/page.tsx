@@ -12,9 +12,9 @@ const features = [
     title: 'Instance Profile Port Editor',
     description: 'Manage icm/server_port_* parameters with validation and conflict detection.',
     icon: Settings,
-    href: '/ports',
-    status: 'Coming soon',
-    enabled: false,
+    href: '/editor/instance-profile',
+    status: 'Available',
+    enabled: true,
   },
   {
     title: 'Rules.txt Rewrite Editor',

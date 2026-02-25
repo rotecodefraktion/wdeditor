@@ -11,6 +11,7 @@ import {
 } from '@/lib/github'
 import { checkRateLimit, incrementRateLimit } from '@/lib/rate-limit'
 import { commitRequestSchema } from '@/lib/github-schema'
+import { checkOrigin } from '@/lib/csrf'
 import type { GitHubCommitResponse, GitHubConflictInfo } from '@/lib/github-schema'
 
 /** Rate limit: 10 commits per 5 minutes per user */
@@ -25,22 +26,11 @@ const COMMIT_RATE_LIMIT = { maxRequests: 10, windowMs: 5 * 60_000 }
  */
 export async function POST(request: NextRequest) {
   // CSRF protection: reject cross-origin requests
-  const origin = request.headers.get('origin')
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL
-  if (origin && appUrl) {
-    try {
-      if (new URL(origin).origin !== new URL(appUrl).origin) {
-        return NextResponse.json(
-          { error: 'Cross-origin request rejected' },
-          { status: 403 }
-        )
-      }
-    } catch {
-      return NextResponse.json(
-        { error: 'Invalid origin header' },
-        { status: 403 }
-      )
-    }
+  if (!checkOrigin(request)) {
+    return NextResponse.json(
+      { error: 'Forbidden', code: 'CSRF_REJECTED' },
+      { status: 403 }
+    )
   }
 
   const supabase = await createClient()
