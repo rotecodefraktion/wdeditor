@@ -20,9 +20,9 @@ const features = [
     title: 'Rules.txt Rewrite Editor',
     description: 'Edit URL rewrite rules for routing and redirection.',
     icon: FileText,
-    href: '/rules',
-    status: 'Coming soon',
-    enabled: false,
+    href: '/editor/rules',
+    status: 'Available',
+    enabled: true,
   },
   {
     title: 'User Management',

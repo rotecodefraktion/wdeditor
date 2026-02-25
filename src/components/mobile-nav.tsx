@@ -56,6 +56,15 @@ export function MobileNav({ isAdmin }: MobileNavProps) {
           >
             <Link href="/editor/instance-profile">Port Editor</Link>
           </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="justify-start"
+            asChild
+            onClick={() => setOpen(false)}
+          >
+            <Link href="/editor/rules">Rules Editor</Link>
+          </Button>
           {isAdmin && (
             <>
               <Separator className="my-2" />

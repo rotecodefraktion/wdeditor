@@ -54,6 +54,9 @@ export default async function AppLayout({
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/editor/instance-profile">Port Editor</Link>
               </Button>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/editor/rules">Rules Editor</Link>
+              </Button>
               {isAdmin && (
                 <>
                   <Button variant="ghost" size="sm" asChild>
