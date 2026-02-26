@@ -20,7 +20,7 @@
 | PROJ-5 | Instance Profile Port Editor (inkl. Pessimistic Locking) | In Review | [PROJ-5-instance-profile-port-editor.md](PROJ-5-instance-profile-port-editor.md) | 2026-02-20 |
 | PROJ-6 | Rules.txt Rewrite Rule Editor (inkl. Pessimistic Locking) | Deployed | [PROJ-6-rules-rewrite-editor.md](PROJ-6-rules-rewrite-editor.md) | 2026-02-20 |
 | PROJ-7 | GitHub Repository Integration (Lesen/Committen) | In Review | [PROJ-7-github-integration.md](PROJ-7-github-integration.md) | 2026-02-20 |
-| PROJ-8 | UI Modernization — Consolut Branding | In Progress | [PROJ-8-ui-modernization-consolut-branding.md](PROJ-8-ui-modernization-consolut-branding.md) | 2026-02-25 |
+| PROJ-8 | UI Modernization — Consolut Branding | Deployed | [PROJ-8-ui-modernization-consolut-branding.md](PROJ-8-ui-modernization-consolut-branding.md) | 2026-02-25 |
 
 <!-- Add features above this line -->
 
