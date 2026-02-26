@@ -1,11 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { FileText, Settings, Users } from 'lucide-react'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
 import { UnconfiguredBanner } from '@/components/settings/unconfigured-banner'
 import { GitHubAccessWarning } from '@/components/github/github-access-warning'
 import { createClient } from '@/lib/supabase/server'
+import { FeatureCard } from '@/components/dashboard/feature-card'
 
 const features = [
   {
@@ -51,7 +48,7 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+        <h1 className="text-3xl font-black tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">
           Welcome to the SAP Web Dispatcher configuration editor.
         </p>
@@ -61,28 +58,17 @@ export default async function DashboardPage() {
       <GitHubAccessWarning userRole={userRole} />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {features.map((feature) => {
-          const Icon = feature.icon
-          return (
-            <Card key={feature.href} className="flex flex-col">
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <Icon className="h-5 w-5 text-muted-foreground" />
-                  <Badge variant={feature.enabled ? 'default' : 'secondary'}>{feature.status}</Badge>
-                </div>
-                <CardTitle className="text-base mt-2">{feature.title}</CardTitle>
-                <CardDescription className="text-sm">
-                  {feature.description}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="mt-auto pt-0">
-                <Button variant="outline" size="sm" className="w-full" asChild disabled={!feature.enabled}>
-                  <Link href={feature.href}>Open</Link>
-                </Button>
-              </CardContent>
-            </Card>
-          )
-        })}
+        {features.map((feature) => (
+          <FeatureCard
+            key={feature.href}
+            title={feature.title}
+            description={feature.description}
+            icon={feature.icon}
+            href={feature.href}
+            status={feature.status}
+            enabled={feature.enabled}
+          />
+        ))}
       </div>
     </div>
   )

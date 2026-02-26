@@ -48,7 +48,7 @@ export default async function SettingsPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Global Settings</h1>
+        <h1 className="text-3xl font-black tracking-tight">Global Settings</h1>
         <p className="text-muted-foreground">
           Configure the GitHub repository, authentication, and file paths for
           the configuration editors.
@@ -59,7 +59,10 @@ export default async function SettingsPage() {
         <ActiveLockWarning lockCount={activeLockCount} />
       )}
 
-      <SettingsForm />
+      <div className="card-premium relative overflow-hidden p-6">
+        <div className="absolute top-0 bottom-0 left-0 w-1 consolut-gradient-v" />
+        <SettingsForm />
+      </div>
     </div>
   )
 }

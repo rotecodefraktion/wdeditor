@@ -9,7 +9,15 @@ const config: Config = {
   ],
   theme: {
   	extend: {
+  		fontFamily: {
+  			sans: ['var(--font-inter)', 'Helvetica Neue', 'sans-serif'],
+  		},
   		colors: {
+  			consolut: {
+  				red: '#E70C2E',
+  				blue: '#3730a3',
+  				dark: '#242424',
+  			},
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
@@ -62,9 +70,9 @@ const config: Config = {
   			}
   		},
   		borderRadius: {
-  			lg: 'var(--radius)',
-  			md: 'calc(var(--radius) - 2px)',
-  			sm: 'calc(var(--radius) - 4px)'
+  			lg: '0.25rem',
+  			md: '0.125rem',
+  			sm: '0.125rem',
   		},
   		keyframes: {
   			'accordion-down': {
@@ -87,6 +95,10 @@ const config: Config = {
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
   			'accordion-up': 'accordion-up 0.2s ease-out'
+  		},
+  		boxShadow: {
+  			premium: '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02)',
+  			glass: '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
   		}
   	}
   },

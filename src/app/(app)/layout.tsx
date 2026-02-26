@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
 import { LogOut, Settings } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
@@ -44,30 +43,29 @@ export default async function AppLayout({
         <div className="container mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <MobileNav isAdmin={isAdmin} />
-            <Link href="/dashboard" className="font-semibold text-sm">
-              SAP Web Dispatcher Editor
+            <Link href="/dashboard" className="flex flex-col items-start">
+              <span className="text-lg font-black text-consolut-dark dark:text-white leading-tight">consolut</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-consolut-red">WD EDITOR</span>
             </Link>
-            <nav className="hidden md:flex items-center gap-1">
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/dashboard">Dashboard</Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/editor/instance-profile">Port Editor</Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/editor/rules">Rules Editor</Link>
-              </Button>
+            <nav className="hidden md:flex items-center gap-4">
+              <Link href="/dashboard" className="uppercase tracking-wider text-xs font-bold text-gray-400 hover:text-foreground transition-colors">
+                Dashboard
+              </Link>
+              <Link href="/editor/instance-profile" className="uppercase tracking-wider text-xs font-bold text-gray-400 hover:text-foreground transition-colors">
+                Port Editor
+              </Link>
+              <Link href="/editor/rules" className="uppercase tracking-wider text-xs font-bold text-gray-400 hover:text-foreground transition-colors">
+                Rules Editor
+              </Link>
               {isAdmin && (
                 <>
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link href="/admin/users">Users</Link>
-                  </Button>
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link href="/settings">
-                      <Settings className="h-4 w-4 mr-1" />
-                      Settings
-                    </Link>
-                  </Button>
+                  <Link href="/admin/users" className="uppercase tracking-wider text-xs font-bold text-gray-400 hover:text-foreground transition-colors">
+                    Users
+                  </Link>
+                  <Link href="/settings" className="uppercase tracking-wider text-xs font-bold text-gray-400 hover:text-foreground transition-colors flex items-center gap-1">
+                    <Settings className="h-3.5 w-3.5" />
+                    Settings
+                  </Link>
                 </>
               )}
             </nav>
@@ -84,8 +82,8 @@ export default async function AppLayout({
       <main className="flex-1 container mx-auto px-4 py-6">{children}</main>
       <footer className="border-t py-4">
         <div className="container mx-auto px-4">
-          <p className="text-xs text-muted-foreground text-center">
-            SAP Web Dispatcher Editor
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">
+            consolut international ag. all rights reserved.
           </p>
         </div>
       </footer>

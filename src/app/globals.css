@@ -23,7 +23,7 @@
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
     --ring: 240 5.9% 10%;
-    --radius: 0.5rem;
+    --radius: 0.25rem;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -81,5 +81,136 @@
   }
   body {
     @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/* ─── consolut Brand Utilities ──────────────────────────────────── */
+
+@layer utilities {
+  .consolut-gradient {
+    background: linear-gradient(
+      90deg,
+      #f59e0b 0%,
+      #ea580c 16.66%,
+      #dc2626 33.33%,
+      #b91c1c 50%,
+      #7c3aed 66.66%,
+      #5b21b6 83.33%,
+      #3730a3 100%
+    );
+  }
+
+  .consolut-gradient-v {
+    background: linear-gradient(
+      180deg,
+      #b91c1c 50%,
+      #7c3aed 66.66%,
+      #5b21b6 83.33%,
+      #3730a3 100%
+    );
+  }
+
+  .consolut-gradient-text {
+    background: linear-gradient(
+      90deg,
+      #f59e0b 0%,
+      #ea580c 16.66%,
+      #dc2626 33.33%,
+      #b91c1c 50%,
+      #7c3aed 66.66%,
+      #5b21b6 83.33%,
+      #3730a3 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .glass {
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  }
+
+  .glass-dark {
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  }
+}
+
+/* Card Premium */
+.card-premium {
+  background-color: hsl(var(--card));
+  border-radius: 4px;
+  border: 1px solid hsl(var(--border));
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05),
+    0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (hover: hover) {
+  .card-premium:hover {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Noise Background */
+.noise {
+  position: relative;
+}
+
+.noise::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.03;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #e5e7eb;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #d1d5db;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .card-premium,
+  .card-premium:hover {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* Print */
+@media print {
+  .consolut-gradient,
+  .consolut-gradient-v,
+  .consolut-gradient-text {
+    background: none;
+    color: inherit;
+  }
+  .card-premium:hover {
+    transform: none;
+    box-shadow: none;
   }
 }

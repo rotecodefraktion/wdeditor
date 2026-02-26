@@ -420,7 +420,7 @@ export default function InstanceProfileEditorPage() {
               Dashboard
             </Link>
           </Button>
-          <h1 className="text-2xl font-bold tracking-tight">
+          <h1 className="text-3xl font-black tracking-tight">
             Instance Profile Port Editor
           </h1>
         </div>
@@ -450,7 +450,7 @@ export default function InstanceProfileEditorPage() {
             </Link>
           </Button>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">
+            <h1 className="text-3xl font-black tracking-tight">
               Instance Profile Port Editor
             </h1>
             <p className="text-sm text-muted-foreground">
@@ -494,8 +494,9 @@ export default function InstanceProfileEditorPage() {
 
       {/* File Header */}
       {lastCommit && (
-        <Card>
+        <Card className="relative overflow-hidden">
           <CardHeader className="py-3 px-4">
+            <div className="absolute top-0 bottom-0 left-0 w-1 consolut-gradient-v" />
             <CardTitle className="text-sm font-normal flex flex-wrap items-center gap-3">
               <Badge variant="outline" className="font-mono text-xs">
                 <GitCommit className="h-3 w-3 mr-1" />

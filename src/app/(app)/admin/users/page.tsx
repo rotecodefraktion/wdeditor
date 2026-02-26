@@ -118,24 +118,27 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">User Management</h1>
+        <h1 className="text-3xl font-black tracking-tight">User Management</h1>
         <p className="text-muted-foreground">
           Manage user registrations, access control, and roles.
         </p>
       </div>
 
-      <UserTable
-        users={users}
-        loading={loading}
-        error={error}
-        currentUserId={currentUserId}
-        currentUserRole={currentUserRole}
-        onApprove={handleApprove}
-        onReject={handleReject}
-        onDeactivate={handleDeactivate}
-        onReactivate={handleReactivate}
-        onRoleChange={handleRoleChange}
-      />
+      <div className="card-premium relative overflow-hidden p-6">
+        <div className="absolute top-0 bottom-0 left-0 w-1 consolut-gradient-v" />
+        <UserTable
+          users={users}
+          loading={loading}
+          error={error}
+          currentUserId={currentUserId}
+          currentUserRole={currentUserRole}
+          onApprove={handleApprove}
+          onReject={handleReject}
+          onDeactivate={handleDeactivate}
+          onReactivate={handleReactivate}
+          onRoleChange={handleRoleChange}
+        />
+      </div>
     </div>
   )
 }
