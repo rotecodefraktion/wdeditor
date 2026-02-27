@@ -1,9 +1,15 @@
 # PROJ-5: Instance Profile Port Editor
 
-## Status: In Review
+## Status: Deployed
 
 **Created:** 2026-02-20
-**Last Updated:** 2026-02-20 (Update: Port-Löschung mit Rules-Integrity-Check)
+**Last Updated:** 2026-02-27 (Deployed locally on port 3002)
+
+## Deployment
+
+- **Target:** Local (http://localhost:3002)
+- **Deployed:** 2026-02-27
+- **Commit:** a0d6284 (fix(PROJ-5): Fix silent lock acquisition error handling)
 
 ## Dependencies
 
