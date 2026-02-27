@@ -1,6 +1,6 @@
 'use client'
 
-import { Lock, LockOpen, Timer, ShieldAlert } from 'lucide-react'
+import { Lock, LockOpen, Timer, ShieldAlert, AlertTriangle, RefreshCw } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
@@ -21,6 +21,10 @@ interface LockStatusBannerProps {
   isAdmin?: boolean
   /** Callback to force-release an expired lock */
   onForceRelease?: () => Promise<void>
+  /** Error message when lock acquisition failed */
+  lockError?: string
+  /** Callback to retry loading and lock acquisition */
+  onRetryLock?: () => void
 }
 
 export function LockStatusBanner({
@@ -31,8 +35,39 @@ export function LockStatusBanner({
   isExpired,
   isAdmin,
   onForceRelease,
+  lockError,
+  onRetryLock,
 }: LockStatusBannerProps) {
   const [isReleasing, setIsReleasing] = useState(false)
+
+  // Lock acquisition failed — show error banner with retry
+  if (lockError) {
+    return (
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertTitle>Lock konnte nicht erworben werden</AlertTitle>
+        <AlertDescription className="space-y-2">
+          <p>
+            {lockError}
+          </p>
+          <p className="text-xs">
+            Die Datei wird im Nur-Lesen-Modus angezeigt. Aenderungen koennen nicht gespeichert werden.
+          </p>
+          {onRetryLock && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onRetryLock}
+              className="mt-1"
+            >
+              <RefreshCw className="h-4 w-4 mr-1" />
+              Erneut versuchen
+            </Button>
+          )}
+        </AlertDescription>
+      </Alert>
+    )
+  }
 
   if (!isLocked && !isLockedByOther) return null
 

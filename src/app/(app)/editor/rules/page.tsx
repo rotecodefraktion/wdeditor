@@ -46,6 +46,8 @@ interface LockState {
   lockedByName?: string
   lockedAt?: string
   isExpired?: boolean
+  /** Set when the lock API call itself fails (network error, server error) */
+  lockError?: string
 }
 
 export default function RulesEditorPage() {
@@ -206,6 +208,18 @@ export default function RulesEditorPage() {
             isExpired: lockData.is_expired,
           })
         }
+      } else {
+        // Lock API failed — show the file in read-only mode with an error banner
+        const lockErrorData = await lockRes.json().catch(() => ({}))
+        const lockErrorMsg =
+          lockErrorData?.error ||
+          `Lock-Server nicht erreichbar (HTTP ${lockRes.status}). Die Datei wird im Nur-Lesen-Modus angezeigt.`
+        setLockState({
+          isLocked: false,
+          isLockedByOther: false,
+          lockError: lockErrorMsg,
+        })
+        toast.error('Lock konnte nicht erworben werden. Nur-Lesen-Modus aktiv.')
       }
 
       setPageState('ready')
@@ -458,10 +472,30 @@ export default function RulesEditorPage() {
           const lockData = await lockRes.json()
           if (lockData.acquired) {
             setLockState({ isLocked: true, isLockedByOther: false })
+          } else {
+            setLockState({
+              isLocked: false,
+              isLockedByOther: true,
+              lockedByName: lockData.locked_by_name,
+              lockedAt: lockData.locked_at,
+              isExpired: lockData.is_expired,
+            })
           }
+        } else {
+          setLockState({
+            isLocked: false,
+            isLockedByOther: false,
+            lockError: 'Lock konnte nach dem Commit nicht erneut erworben werden. Bitte Seite neu laden.',
+          })
+          toast.error('Lock konnte nach dem Commit nicht erneut erworben werden.')
         }
       } catch {
-        // Silent - user can refresh
+        setLockState({
+          isLocked: false,
+          isLockedByOther: false,
+          lockError: 'Netzwerkfehler beim Lock-Erwerb. Bitte Seite neu laden.',
+        })
+        toast.error('Netzwerkfehler beim Lock-Erwerb nach dem Commit.')
       }
     }, 500)
   }
@@ -648,6 +682,8 @@ export default function RulesEditorPage() {
         isExpired={lockState.isExpired}
         isAdmin={isAdmin}
         onForceRelease={handleForceRelease}
+        lockError={lockState.lockError}
+        onRetryLock={loadFile}
       />
 
       {/* Parse Warnings */}
