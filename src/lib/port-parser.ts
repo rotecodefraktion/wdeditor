@@ -50,6 +50,8 @@ export interface PortEntry {
   rawLine: string | null
   /** Unique key for React rendering */
   id: string
+  /** Optional comment text (stored as # line before the port entry in the file) */
+  comment?: string
 }
 
 /** Result of parsing the entire instance profile */
@@ -62,11 +64,11 @@ export interface ParseResult {
   lineMap: LineMapEntry[]
 }
 
-interface LineMapEntry {
-  type: 'port' | 'other'
+export interface LineMapEntry {
+  type: 'port' | 'other' | 'port-comment'
   /** Original line index */
   lineIndex: number
-  /** For 'port' type: the port entry index */
+  /** For 'port' / 'port-comment' type: the port entry index */
   portIndex?: number
   /** Original line text */
   originalLine: string
@@ -93,6 +95,34 @@ export function parseInstanceProfile(content: string): ParseResult {
       const index = parseInt(match[1], 10)
       const paramsStr = match[2].trim()
       const entry = parsePortParams(index, paramsStr, line)
+
+      // Check if the immediately preceding line is a # comment line.
+      // If so, extract it as the port comment and remove it from nonPortLines/lineMap.
+      if (lineMap.length > 0) {
+        const prevMapping = lineMap[lineMap.length - 1]
+        if (
+          prevMapping.type === 'other' &&
+          prevMapping.originalLine.trimStart().startsWith('#')
+        ) {
+          // Extract comment text: strip leading # and whitespace
+          const commentText = prevMapping.originalLine
+            .trimStart()
+            .replace(/^#\s*/, '')
+          entry.comment = commentText
+
+          // Remove the comment line from nonPortLines (it was the last one added)
+          nonPortLines.pop()
+
+          // Replace the lineMap entry type so it is owned by the port entry
+          lineMap[lineMap.length - 1] = {
+            type: 'port-comment',
+            lineIndex: prevMapping.lineIndex,
+            portIndex: index,
+            originalLine: prevMapping.originalLine,
+          }
+        }
+      }
+
       portEntries.push(entry)
       lineMap.push({
         type: 'port',
@@ -217,18 +247,32 @@ export function serializeInstanceProfile(
         resultLines.push(nonPortLines[nonPortIdx])
         nonPortIdx++
       }
+    } else if (mapping.type === 'port-comment' && mapping.portIndex !== undefined) {
+      // This was an original comment line for a port.
+      // The comment will be written by the 'port' mapping entry below,
+      // so we skip it here. If the port was deleted, we also skip the comment.
+      continue
     } else if (mapping.type === 'port' && mapping.portIndex !== undefined) {
       const entry = portByIndex.get(mapping.portIndex)
       if (entry) {
+        // Write comment line if the entry has a non-empty comment
+        const trimmedComment = entry.comment?.trim()
+        if (trimmedComment) {
+          resultLines.push(`# ${sanitizeValue(trimmedComment)}`)
+        }
         resultLines.push(serializePortEntry(entry))
         portByIndex.delete(mapping.portIndex)
       }
-      // If entry was deleted, skip this line
+      // If entry was deleted, skip this line (and its comment was already skipped)
     }
   }
 
   // Append any newly added port entries (not in original lineMap)
   for (const entry of portByIndex.values()) {
+    const trimmedComment = entry.comment?.trim()
+    if (trimmedComment) {
+      resultLines.push(`# ${sanitizeValue(trimmedComment)}`)
+    }
     resultLines.push(serializePortEntry(entry))
   }
 
@@ -322,5 +366,6 @@ export function createEmptyPortEntry(index: number): PortEntry {
     unknownKeys: [],
     rawLine: null,
     id: `port-${index}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    comment: undefined,
   }
 }

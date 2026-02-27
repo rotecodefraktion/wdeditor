@@ -136,110 +136,126 @@ function PortTableRow({
     )
   }
 
+  const totalColumns = readOnly ? 5 : 6
+
   return (
-    <TableRow
-      className={!readOnly ? 'cursor-pointer hover:bg-muted/50' : undefined}
-      onClick={!readOnly ? () => onEdit(entry) : undefined}
-    >
-      <TableCell className="font-mono text-sm">{entry.index}</TableCell>
-      <TableCell>
-        <Badge
-          variant={
-            entry.prot === 'HTTPS'
-              ? 'default'
-              : entry.prot === 'HTTP'
-                ? 'secondary'
-                : 'outline'
-          }
-        >
-          {entry.prot}
-        </Badge>
-      </TableCell>
-      <TableCell className="font-mono">{entry.port ?? '--'}</TableCell>
-      <TableCell className="text-muted-foreground">
-        {entry.timeout !== null ? `${entry.timeout}s` : '--'}
-      </TableCell>
-      <TableCell>
-        <div className="flex flex-wrap gap-1">
-          {additionalParams.map((param) => (
-            <span
-              key={param}
-              className="text-xs bg-muted px-1.5 py-0.5 rounded font-mono"
-            >
-              {param}
-            </span>
-          ))}
-          {entry.unknownKeys.length > 0 && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Badge variant="outline" className="text-yellow-600 border-yellow-400">
-                    <AlertTriangle className="h-3 w-3 mr-1" />
-                    {entry.unknownKeys.length} unbekannt
-                  </Badge>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Unbekannte Parameter: {entry.unknownKeys.join(', ')}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-        </div>
-      </TableCell>
-      {!readOnly && (
-        <TableCell className="text-right">
-          <div className="flex justify-end gap-1">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={(e) => { e.stopPropagation(); onEdit(entry) }}
-                    aria-label={`Port ${entry.port} bearbeiten`}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Bearbeiten</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={(e) => { e.stopPropagation(); onDuplicate(entry) }}
-                    aria-label={`Port ${entry.port} duplizieren`}
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Duplizieren</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-destructive hover:text-destructive"
-                    onClick={(e) => { e.stopPropagation(); onDelete(entry) }}
-                    aria-label={`Port ${entry.port} loeschen`}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Loeschen</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+    <>
+      <TableRow
+        className={!readOnly ? 'cursor-pointer hover:bg-muted/50' : undefined}
+        onClick={!readOnly ? () => onEdit(entry) : undefined}
+      >
+        <TableCell className="font-mono text-sm">{entry.index}</TableCell>
+        <TableCell>
+          <Badge
+            variant={
+              entry.prot === 'HTTPS'
+                ? 'default'
+                : entry.prot === 'HTTP'
+                  ? 'secondary'
+                  : 'outline'
+            }
+          >
+            {entry.prot}
+          </Badge>
+        </TableCell>
+        <TableCell className="font-mono">{entry.port ?? '--'}</TableCell>
+        <TableCell className="text-muted-foreground">
+          {entry.timeout !== null ? `${entry.timeout}s` : '--'}
+        </TableCell>
+        <TableCell>
+          <div className="flex flex-wrap gap-1">
+            {additionalParams.map((param) => (
+              <span
+                key={param}
+                className="text-xs bg-muted px-1.5 py-0.5 rounded font-mono"
+              >
+                {param}
+              </span>
+            ))}
+            {entry.unknownKeys.length > 0 && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Badge variant="outline" className="text-yellow-600 border-yellow-400">
+                      <AlertTriangle className="h-3 w-3 mr-1" />
+                      {entry.unknownKeys.length} unbekannt
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Unbekannte Parameter: {entry.unknownKeys.join(', ')}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </div>
         </TableCell>
+        {!readOnly && (
+          <TableCell className="text-right">
+            <div className="flex justify-end gap-1">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={(e) => { e.stopPropagation(); onEdit(entry) }}
+                      aria-label={`Port ${entry.port} bearbeiten`}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Bearbeiten</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={(e) => { e.stopPropagation(); onDuplicate(entry) }}
+                      aria-label={`Port ${entry.port} duplizieren`}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Duplizieren</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive hover:text-destructive"
+                      onClick={(e) => { e.stopPropagation(); onDelete(entry) }}
+                      aria-label={`Port ${entry.port} loeschen`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Loeschen</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          </TableCell>
+        )}
+      </TableRow>
+      {entry.comment && (
+        <TableRow
+          className={`border-t-0 ${!readOnly ? 'cursor-pointer hover:bg-muted/50' : ''}`}
+          onClick={!readOnly ? () => onEdit(entry) : undefined}
+        >
+          <TableCell colSpan={totalColumns} className="pt-0 pb-2 pl-6">
+            <p className="text-xs text-muted-foreground italic truncate max-w-full" title={entry.comment}>
+              # {entry.comment}
+            </p>
+          </TableCell>
+        </TableRow>
       )}
-    </TableRow>
+    </>
   )
 }

@@ -393,5 +393,96 @@ Kommentare leben ausschließlich in der Instanzprofil-Datei auf GitHub. Kein Sup
 - **Production Ready:** NO
 - **Recommendation:** Fix BUG-1 (comment data loss) and BUG-2 (long comment form blocking) before deployment. Both are Medium severity but affect data integrity and usability for edge cases that real SAP config files may contain.
 
+---
+
+## QA Round 2 — Bug Fix Verification
+
+**Tested:** 2026-02-27
+**Tester:** QA Engineer (AI)
+**Fix Commit:** `3c52f78` — `fix(PROJ-10): Fix comment data loss and long comment form blocking`
+**Build Status:** PASS (npm run build succeeds without errors)
+
+---
+
+### BUG-1 Re-Test: Comment data loss when comment starts with `#`
+
+- **Status:** FIXED
+- **Verification:** The `.replace(/^#\s*/, '')` regex has been removed from `page.tsx` line 291. The comment sanitization now only applies `.trim()`. The parser already strips the file-level `#` prefix when reading (port-parser.ts lines 108-110), so no additional stripping is needed in the form handler.
+- **Round-trip test (code review):**
+  1. File contains `# #FF0000 is the color red` before a port line
+  2. Parser extracts comment as `#FF0000 is the color red` (strips leading `#`)
+  3. User edits the port, submits without changing the comment
+  4. Form handler applies `.trim()` only -- comment remains `"#FF0000 is the color red"`
+  5. Serializer writes `# #FF0000 is the color red` to the file
+  6. Result: No data loss. Round-trip is safe.
+- **File:** `/Users/davidkrcek/development/consolut/wdeditor/src/app/(app)/editor/instance-profile/page.tsx` lines 289-292
+
+---
+
+### BUG-2 Re-Test: Long comments block form submission
+
+- **Status:** FIXED
+- **Verification:** Both `useEffect` reset branches in `port-form.tsx` now truncate the pre-filled comment to 200 characters:
+  - Edit mode (line 115): `comment: (entry.comment || '').slice(0, 200),`
+  - Duplicate mode (line 126): `comment: (entry.comment || '').slice(0, 200),`
+- **Behavior test (code review):**
+  1. File contains a 250-character comment before a port line
+  2. Parser extracts the full 250-char comment into `entry.comment`
+  3. User clicks edit on that port
+  4. Form pre-fills comment truncated to 200 chars via `.slice(0, 200)`
+  5. Zod validation passes (200 chars <= max 200)
+  6. User can submit the form without manually truncating
+  7. Comment is saved as the truncated 200-char version
+- **Note:** The truncation is visible to the user in the form field (200 chars instead of the original 250). This matches the spec requirement: "beim Speichern auf 200 Zeichen beschraenkt." The table display still shows the full untruncated text (until the port is saved with the truncated version).
+- **File:** `/Users/davidkrcek/development/consolut/wdeditor/src/components/port-editor/port-form.tsx` lines 115, 126
+
+---
+
+### BUG-3 Re-Test: Status mismatch in spec header
+
+- **Status:** FIXED
+- **Verification:** Spec header at line 3 reads `## Status: In Progress`. INDEX.md line 25 reads `In Progress` for PROJ-10. Both match.
+- **Files:**
+  - `/Users/davidkrcek/development/consolut/wdeditor/features/PROJ-10-port-comments.md` line 3
+  - `/Users/davidkrcek/development/consolut/wdeditor/features/INDEX.md` line 25
+
+---
+
+### New Bugs Introduced by Fixes
+
+No new bugs found. Specifically verified:
+
+1. **User-typed `#` prefix in comment field:** If a user types `# My comment` in the form, the serializer writes `# # My comment` to the file. On next load, the parser reads it back as `# My comment`. Round-trip is safe -- no data corruption.
+
+2. **`.slice(0, 200)` truncation at code-point boundary:** JavaScript `.slice()` operates on UTF-16 code units. For standard text (Latin, German umlauts, common special chars), this is identical to character count. Edge case with surrogate pairs (e.g., emoji at position 199-200) could split a surrogate pair, but this is an extreme edge case unlikely in SAP config comments and the `maxLength={200}` HTML attribute on the input field has the same behavior. Not a bug.
+
+3. **Regression on `getDefaultCommitMessage()`:** The new function (added in the same fix commit) correctly detects comment-only changes and generates appropriate messages. No performance concern -- parsing is done once per commit modal open.
+
+4. **Build verification:** `npm run build` passes cleanly with zero TypeScript errors and zero warnings (aside from pre-existing lockfile detection note).
+
+---
+
+### Regression Check (Round 2)
+
+- [x] PROJ-5 (Port Editor): Core CRUD operations unaffected by the fix changes
+- [x] PROJ-6 (Rules Editor): No files changed; unaffected
+- [x] PROJ-8 (UI Modernization): No visual changes; unaffected
+- [x] Port-parser.ts: No changes between Round 1 and Round 2 (parser logic unchanged)
+- [x] Port-table.tsx: Comment display logic unchanged; still shows `entry.comment` conditionally
+
+---
+
+### Round 2 Summary
+
+- **Bugs re-tested:** 3/3 verified as FIXED
+- **New bugs introduced:** 0
+- **Build:** PASS
+- **Regression:** PASS -- no existing features affected
+
+### Final Verdict
+
+- **Production Ready:** YES
+- **All 3 bugs from Round 1 are fixed. No new issues detected. The feature is ready for deployment.**
+
 ## Deployment
 _To be added by /deploy_
