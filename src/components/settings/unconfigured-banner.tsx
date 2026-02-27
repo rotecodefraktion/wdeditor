@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Settings } from 'lucide-react'
 
@@ -14,6 +15,7 @@ interface UnconfiguredBannerProps {
  * Per AC-9: Only shown to non-admin users. Admins see the Settings nav link instead.
  */
 export function UnconfiguredBanner({ userRole }: UnconfiguredBannerProps) {
+  const t = useTranslations('settings')
   const [show, setShow] = useState(false)
 
   // Admins and super_admins should never see this banner (AC-9)
@@ -43,12 +45,10 @@ export function UnconfiguredBanner({ userRole }: UnconfiguredBannerProps) {
     <Alert className="border-blue-500/50 bg-blue-50 dark:bg-blue-950/30">
       <Settings className="h-4 w-4 text-blue-600 dark:text-blue-400" />
       <AlertTitle className="text-blue-800 dark:text-blue-200">
-        Die App ist noch nicht konfiguriert
+        {t('unconfiguredTitle')}
       </AlertTitle>
       <AlertDescription className="text-blue-700 dark:text-blue-300">
-        Die Anwendung wurde noch nicht eingerichtet. Bitte wenden Sie sich an
-        einen Administrator, um die GitHub-Repository-Verbindung in den
-        Einstellungen zu konfigurieren.
+        {t('unconfiguredDescription')}
       </AlertDescription>
     </Alert>
   )

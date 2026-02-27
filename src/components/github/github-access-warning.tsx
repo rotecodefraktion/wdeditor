@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { AlertTriangle } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import type { GitHubAccessCheckResponse } from '@/lib/github-schema'
@@ -18,6 +19,7 @@ interface GitHubAccessWarningProps {
  * - If settings are not configured, silently skips (UnconfiguredBanner handles that).
  */
 export function GitHubAccessWarning({ userRole }: GitHubAccessWarningProps) {
+  const t = useTranslations('github')
   const [data, setData] = useState<GitHubAccessCheckResponse | null>(null)
 
   const isAdmin = userRole === 'admin' || userRole === 'super_admin'
@@ -49,14 +51,14 @@ export function GitHubAccessWarning({ userRole }: GitHubAccessWarningProps) {
 
   const message =
     data.reason === 'NO_GITHUB_USERNAME'
-      ? 'Dein Benutzerprofil hat keinen GitHub-Username hinterlegt. Bitte den Admin kontaktieren.'
-      : `Dein GitHub-Account (${data.username}) hat keinen Zugriff auf das Repository – bitte den Admin kontaktieren.`
+      ? t('noGithubUsername')
+      : t('noRepoAccessDescription', { username: data.username ?? '' })
 
   return (
     <Alert className="border-orange-500/50 bg-orange-50 dark:bg-orange-950/30">
       <AlertTriangle className="h-4 w-4 text-orange-600 dark:text-orange-400" />
       <AlertTitle className="text-orange-800 dark:text-orange-200">
-        Kein Repository-Zugriff
+        {t('noRepoAccess')}
       </AlertTitle>
       <AlertDescription className="text-orange-700 dark:text-orange-300">
         {message}

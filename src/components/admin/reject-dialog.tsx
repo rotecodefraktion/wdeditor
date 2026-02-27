@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import {
   Dialog,
   DialogContent,
@@ -21,6 +22,8 @@ interface RejectDialogProps {
 }
 
 export function RejectDialog({ user, onClose, onConfirm }: RejectDialogProps) {
+  const t = useTranslations('admin')
+  const tc = useTranslations('common')
   const [reason, setReason] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -45,18 +48,16 @@ export function RejectDialog({ user, onClose, onConfirm }: RejectDialogProps) {
     <Dialog open={!!user} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Reject User</DialogTitle>
+          <DialogTitle>{t('rejectTitle')}</DialogTitle>
           <DialogDescription>
-            Reject the registration request from{' '}
-            <span className="font-medium">{user?.full_name || user?.github_username || 'this user'}</span>.
-            You can optionally provide a reason.
+            {t('rejectDescription', { name: user?.full_name || user?.github_username || 'this user' })}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-2">
-          <Label htmlFor="reject-reason">Reason (optional)</Label>
+          <Label htmlFor="reject-reason">{t('rejectReasonLabel')}</Label>
           <Textarea
             id="reject-reason"
-            placeholder="Enter a reason for rejection..."
+            placeholder={t('rejectReasonPlaceholder')}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             maxLength={500}
@@ -68,10 +69,10 @@ export function RejectDialog({ user, onClose, onConfirm }: RejectDialogProps) {
         </div>
         <DialogFooter className="gap-2 sm:gap-0">
           <Button variant="outline" onClick={onClose} disabled={loading}>
-            Cancel
+            {tc('cancel')}
           </Button>
           <Button variant="destructive" onClick={handleConfirm} disabled={loading}>
-            {loading ? 'Rejecting...' : 'Reject User'}
+            {loading ? t('rejecting') : t('rejectUser')}
           </Button>
         </DialogFooter>
       </DialogContent>

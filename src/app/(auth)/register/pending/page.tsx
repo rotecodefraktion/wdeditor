@@ -2,8 +2,11 @@ import { Clock } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 
-export default function PendingApprovalPage() {
+export default async function PendingApprovalPage() {
+  const t = await getTranslations('auth')
+
   return (
     <Card>
       <CardHeader className="text-center">
@@ -12,20 +15,17 @@ export default function PendingApprovalPage() {
             <Clock className="h-6 w-6 text-muted-foreground" />
           </div>
         </div>
-        <CardTitle>Account Pending Approval</CardTitle>
+        <CardTitle>{t('pendingApproval')}</CardTitle>
         <CardDescription>
-          Your email has been confirmed. An administrator will review your
-          registration request and you&apos;ll receive an email once your account is
-          approved.
+          {t('pendingApprovalDescription')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground text-center">
-          If you have not received a response within 24 hours, please contact your
-          SAP administrator directly.
+          {t('noResponseHint')}
         </p>
         <Button variant="outline" className="w-full" asChild>
-          <Link href="/login">Back to Sign In</Link>
+          <Link href="/login">{t('backToSignIn')}</Link>
         </Button>
       </CardContent>
     </Card>

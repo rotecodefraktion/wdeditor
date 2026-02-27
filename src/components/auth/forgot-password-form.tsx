@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Loader2, CheckCircle } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -19,15 +20,17 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 
-const schema = z.object({
-  email: z.string().email('Please enter a valid email address.'),
-})
-
-type FormValues = z.infer<typeof schema>
+type FormValues = { email: string }
 
 export function ForgotPasswordForm() {
+  const t = useTranslations('auth')
+  const tv = useTranslations('validation')
   const [submitted, setSubmitted] = useState(false)
   const [githubOnlyError, setGithubOnlyError] = useState(false)
+
+  const schema = z.object({
+    email: z.string().email(tv('emailRequired')),
+  })
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -37,7 +40,6 @@ export function ForgotPasswordForm() {
   async function onSubmit(values: FormValues) {
     setGithubOnlyError(false)
 
-    // Check if the user signed up with GitHub OAuth only (no password)
     try {
       const checkResponse = await fetch('/api/auth/check-provider', {
         method: 'POST',
@@ -65,7 +67,6 @@ export function ForgotPasswordForm() {
       return
     }
 
-    // Always show the same message for security (don't reveal if email exists)
     setSubmitted(true)
   }
 
@@ -74,8 +75,7 @@ export function ForgotPasswordForm() {
       <Alert>
         <CheckCircle className="h-4 w-4" />
         <AlertDescription>
-          If this email is registered, a password reset link has been sent. Please
-          check your inbox.
+          {t('resetLinkSent')}
         </AlertDescription>
       </Alert>
     )
@@ -86,7 +86,7 @@ export function ForgotPasswordForm() {
       {githubOnlyError && (
         <Alert variant="destructive">
           <AlertDescription>
-            You signed up with GitHub. Please use the GitHub login button instead.
+            {t('githubOnlyError')}
           </AlertDescription>
         </Alert>
       )}
@@ -97,9 +97,9 @@ export function ForgotPasswordForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email Address</FormLabel>
+                <FormLabel>{t('emailAddress')}</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder="admin@example.com" {...field} />
+                  <Input type="email" placeholder={t('emailPlaceholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -113,7 +113,7 @@ export function ForgotPasswordForm() {
             {form.formState.isSubmitting && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             )}
-            Send Reset Link
+            {t('sendResetLink')}
           </Button>
         </form>
       </Form>

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Menu } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -19,6 +20,7 @@ interface MobileNavProps {
 
 export function MobileNav({ isAdmin }: MobileNavProps) {
   const [open, setOpen] = useState(false)
+  const t = useTranslations('common')
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -27,14 +29,14 @@ export function MobileNav({ isAdmin }: MobileNavProps) {
           variant="ghost"
           size="icon"
           className="md:hidden"
-          aria-label="Navigation oeffnen"
+          aria-label={t('openNavigation')}
         >
           <Menu className="h-5 w-5" />
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="w-64">
         <SheetHeader>
-          <SheetTitle className="text-left">Navigation</SheetTitle>
+          <SheetTitle className="text-left">{t('navigation')}</SheetTitle>
         </SheetHeader>
         <Separator className="my-4" />
         <nav className="flex flex-col gap-2">
@@ -45,7 +47,7 @@ export function MobileNav({ isAdmin }: MobileNavProps) {
             asChild
             onClick={() => setOpen(false)}
           >
-            <Link href="/dashboard">Dashboard</Link>
+            <Link href="/dashboard">{t('dashboard')}</Link>
           </Button>
           <Button
             variant="ghost"
@@ -54,7 +56,7 @@ export function MobileNav({ isAdmin }: MobileNavProps) {
             asChild
             onClick={() => setOpen(false)}
           >
-            <Link href="/editor/instance-profile">Port Editor</Link>
+            <Link href="/editor/instance-profile">{t('portEditor')}</Link>
           </Button>
           <Button
             variant="ghost"
@@ -63,7 +65,7 @@ export function MobileNav({ isAdmin }: MobileNavProps) {
             asChild
             onClick={() => setOpen(false)}
           >
-            <Link href="/editor/rules">Rules Editor</Link>
+            <Link href="/editor/rules">{t('rulesEditor')}</Link>
           </Button>
           {isAdmin && (
             <>
@@ -75,7 +77,7 @@ export function MobileNav({ isAdmin }: MobileNavProps) {
                 asChild
                 onClick={() => setOpen(false)}
               >
-                <Link href="/admin/users">Users</Link>
+                <Link href="/admin/users">{t('users')}</Link>
               </Button>
               <Button
                 variant="ghost"
@@ -84,7 +86,7 @@ export function MobileNav({ isAdmin }: MobileNavProps) {
                 asChild
                 onClick={() => setOpen(false)}
               >
-                <Link href="/settings">Settings</Link>
+                <Link href="/settings">{t('settings')}</Link>
               </Button>
             </>
           )}

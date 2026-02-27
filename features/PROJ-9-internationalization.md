@@ -1,6 +1,6 @@
 # PROJ-9: Internationalization (i18n) — DE / EN / PT
 
-## Status: Planned
+## Status: In Progress
 **Created:** 2026-02-27
 **Last Updated:** 2026-02-27
 
@@ -83,10 +83,148 @@ Die App unterstützt drei Sprachen: Deutsch (Standard), Englisch und Portugiesis
 <!-- Sections below are added by subsequent skills -->
 
 ## Tech Design (Solution Architect)
-_To be added by /architecture_
+
+### Overview
+
+i18n wird über die Bibliothek **next-intl** umgesetzt — die empfohlene Lösung für Next.js App Router, die sowohl Server Components als auch Client Components unterstützt. Sprache wird **ohne URL-Präfixe** gesteuert: ein Cookie (`NEXT_LOCALE`) trägt die Locale-Information, die Middleware liest sie serverseitig aus. Eingeloggte User erhalten ihre gespeicherte Sprachpräferenz aus dem User-Profil in der Datenbank, die beim Login automatisch in den Cookie synchronisiert wird.
+
+---
+
+### Component Structure (Visual Tree)
+
+```
+Layouts (beide Layouts erhalten den LanguageSwitcher)
+├── (app)/layout.tsx  ← Server Component
+│   └── Header
+│       ├── Navigation
+│       ├── ThemeToggle  (bereits vorhanden)
+│       ├── LanguageSwitcher  ← NEU (Client Component)
+│       └── SignOutButton
+├── (auth)/layout.tsx  ← Server Component
+│   └── Header
+│       ├── ThemeToggle  (bereits vorhanden)
+│       └── LanguageSwitcher  ← NEU (Client Component)
+│
+Provider-Schicht (Root Layout)
+└── NextIntlClientProvider  ← NEU (umschließt alle Client Components)
+    └── übergibt geladene Übersetzungen an den Client
+│
+Neue Komponente
+└── src/components/language-switcher.tsx
+    ├── Dropdown-Button mit aktiver Sprache (DE / EN / PT)
+    ├── Klick → setzt Cookie NEXT_LOCALE
+    ├── Klick (eingeloggt) → ruft PATCH /api/user/locale auf
+    └── Sofort-Reload der Seite (hard reload), um neue Texte anzuzeigen
+│
+Übersetzungsdateien
+├── messages/de.json  ← Deutsch (Fallback / Standard)
+├── messages/en.json  ← Englisch
+└── messages/pt.json  ← Portugiesisch (Brasilien)
+│
+Konfiguration
+├── i18n/request.ts   ← Server-seitige Locale-Auflösung (liest Cookie)
+├── middleware.ts     ← Aktualisiert/setzt NEXT_LOCALE-Cookie pro Request
+└── next.config.ts   ← next-intl Plugin eingebunden
+```
+
+---
+
+### Locale-Auflösungs-Logik (Prioritäten)
+
+```
+Eingeloggter User:
+  1. user_profiles.locale aus der Datenbank (höchste Priorität)
+  2. Cookie NEXT_LOCALE (Fallback, solange Profil noch nicht geladen)
+  3. 'de' (Default)
+
+Nicht-eingeloggter Besucher:
+  1. Cookie NEXT_LOCALE
+  2. 'de' (Default)
+
+Beim Login:
+  → Profil-Sprache wird aus DB gelesen und Cookie wird synchronisiert
+```
+
+---
+
+### Data Model
+
+**Neue DB-Spalte (bereits im Spec erwähnt):**
+
+```
+Tabelle: user_profiles
+Neue Spalte: locale  TEXT  NOT NULL  DEFAULT 'de'
+Erlaubte Werte: 'de', 'en', 'pt'
+```
+
+**Cookie:**
+- Name: `NEXT_LOCALE`
+- Werte: `'de'`, `'en'`, `'pt'`
+- Lebensdauer: 1 Jahr
+- Zugänglichkeit: `HttpOnly: false` (muss vom Client-seitigen LanguageSwitcher gesetzt werden können)
+
+---
+
+### New API Endpoint
+
+```
+PATCH /api/user/locale
+  → Empfängt: { locale: 'de' | 'en' | 'pt' }
+  → Prüft: Auth-Session vorhanden
+  → Schreibt: user_profiles.locale für den eingeloggten User
+  → Antwortet: 200 OK oder Fehlermeldung
+```
+
+---
+
+### Tech Decisions (Begründung)
+
+| Entscheidung | Gewählt | Warum |
+|---|---|---|
+| i18n-Bibliothek | **next-intl** | Erste Wahl für Next.js App Router; unterstützt Server Components nativ; keine URL-Präfixe erforderlich |
+| Locale-Speicherung (Client) | **Cookie** (nicht localStorage) | Serverseitig lesbar → Server Components können sofort die richtige Sprache rendern |
+| Locale-Speicherung (User) | **DB-Spalte** | Geräteunabhängig; Profil-Einstellung folgt dem User auf allen Browsern nach Login |
+| Sprachumschalter-Strategie | **Hard reload nach Sprachwechsel** | Stellt sicher, dass Server Components mit der neuen Locale neu gerendert werden; einfacher als einen komplexen Client-State zu managen |
+| Keine URL-Präfixe | Explizit aus Spec | `/de/`, `/en/` wären unerwünscht; Cookie-basierter Ansatz erfüllt die Anforderung |
+| Fallback-Sprache | **Deutsch ('de')** | Primäre Zielgruppe; Standard gemäß Spec |
+
+---
+
+### Dependencies (neue Packages)
+
+| Package | Zweck |
+|---|---|
+| `next-intl` | i18n-Framework für Next.js App Router (Server + Client) |
+
+---
+
+### Scope der Übersetzungsarbeit
+
+Alle User-sichtbaren Strings in folgenden Komponenten müssen auf i18n-Keys umgestellt werden (ca. 30 Dateien):
+
+**Auth-Bereich:** `login-form`, `registration-form`, `forgot-password-form`, `new-password-form`, `resend-email-button`, `status-banner`, Auth-Layout-Texte
+
+**App-Bereich:** `(app)/layout.tsx` (Navigation-Links, Sign Out), Dashboard, `feature-card`
+
+**Port-Editor:** `port-form`, `port-table`, `lock-status-banner`, `delete-port-dialog`, `readonly-params-section`
+
+**Rules-Editor:** `rule-form`, `rule-card`, `port-section`, `global-rules-section`, `delete-rule-dialog`
+
+**Admin:** `user-table`, `role-select`, `deactivate-dialog`, `reject-dialog`
+
+**GitHub:** `commit-modal`, `diff-viewer`, `conflict-warning`, `github-access-warning`
+
+**Settings:** `settings-form`, `connection-test-results`, `active-lock-warning`, `unconfigured-banner`
+
+**Shared:** Alle Toast-Meldungen in API-Routen und Page-Komponenten; Zod-Validierungsfehler
 
 ## QA Test Results
 _To be added by /qa_
 
 ## Deployment
-_To be added by /deploy_
+
+**Target:** Local (http://localhost:3002)
+**Deployed:** 2026-02-28
+**Build:** `npm run build` ✅
+**Lint:** 0 neue Fehler (10 pre-existing, unverändert)
+**Migration:** `add_locale_to_user_profiles` auf Supabase (wdeditor) angewendet

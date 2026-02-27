@@ -3,15 +3,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 import { ForgotPasswordForm } from '@/components/auth/forgot-password-form'
+import { getTranslations } from 'next-intl/server'
 
-export default function ForgotPasswordPage() {
+export default async function ForgotPasswordPage() {
+  const t = await getTranslations('auth')
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Reset Password</CardTitle>
+        <CardTitle>{t('resetPasswordTitle')}</CardTitle>
         <CardDescription>
-          Enter your email and we&apos;ll send you a reset link if the address is
-          registered.
+          {t('resetPasswordDescription')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -19,7 +21,7 @@ export default function ForgotPasswordPage() {
         <Button variant="ghost" className="w-full" asChild>
           <Link href="/login">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Sign In
+            {t('backToSignIn')}
           </Link>
         </Button>
       </CardContent>

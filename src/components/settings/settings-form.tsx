@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2, Eye, EyeOff, Plug, Save } from 'lucide-react'
@@ -37,6 +38,7 @@ import {
 } from '@/lib/settings-schema'
 
 export function SettingsForm() {
+  const t = useTranslations('settings')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -99,7 +101,7 @@ export function SettingsForm() {
       // If no new PAT provided but one already exists, that's fine
       if (!values.github_pat && !hasPat) {
         form.setError('github_pat', {
-          message: 'A GitHub PAT is required for the initial setup.',
+          message: t('patRequired'),
         })
         setSaving(false)
         return
@@ -128,16 +130,16 @@ export function SettingsForm() {
             }
           })
         } else {
-          toast.error(data.error || 'Failed to save settings')
+          toast.error(data.error || t('saveError'))
         }
         return
       }
 
-      toast.success('Settings saved successfully.')
+      toast.success(t('savedSuccess'))
       // Refresh to get updated state (PAT hint, timestamp)
       await fetchSettings()
     } catch {
-      toast.error('An unexpected error occurred while saving.')
+      toast.error(t('saveError'))
     } finally {
       setSaving(false)
     }
@@ -155,7 +157,7 @@ export function SettingsForm() {
       const data = await res.json()
 
       if (!res.ok) {
-        toast.error(data.error || 'Connection test failed')
+        toast.error(data.error || t('connectionFailed'))
         return
       }
 
@@ -170,16 +172,14 @@ export function SettingsForm() {
       ).length
 
       if (failCount > 0) {
-        toast.error(`Connection test: ${failCount} check(s) failed.`)
+        toast.error(t('connectionFailCount', { count: failCount }))
       } else if (warnCount > 0) {
-        toast.warning(
-          `Connection test passed with ${warnCount} warning(s).`
-        )
+        toast.warning(t('connectionWarnCount', { count: warnCount }))
       } else {
-        toast.success('All connection checks passed.')
+        toast.success(t('connectionSuccess'))
       }
     } catch {
-      toast.error('Failed to run connection test.')
+      toast.error(t('connectionTestError'))
     } finally {
       setTesting(false)
     }
@@ -193,9 +193,9 @@ export function SettingsForm() {
     return (
       <Alert variant="destructive">
         <AlertDescription>
-          Failed to load settings: {error}.{' '}
+          {t('loadError', { error })}{' '}
           <Button variant="link" className="p-0 h-auto" onClick={fetchSettings}>
-            Try again
+            {t('tryAgain')}
           </Button>
         </AlertDescription>
       </Alert>
@@ -208,10 +208,9 @@ export function SettingsForm() {
         {/* GitHub Section */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">GitHub Repository</CardTitle>
+            <CardTitle className="text-lg">{t('githubRepoTitle')}</CardTitle>
             <CardDescription>
-              Configure the GitHub repository and authentication for
-              configuration file access.
+              {t('githubRepoDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -220,16 +219,15 @@ export function SettingsForm() {
               name="github_repo"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Repository</FormLabel>
+                  <FormLabel>{t('repositoryLabel')}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="owner/repo or https://github.com/owner/repo"
+                      placeholder={t('repositoryPlaceholder')}
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    Enter as owner/repo (e.g. acme/web-dispatcher-config) or
-                    full GitHub URL.
+                    {t('repositoryDescription')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -241,15 +239,15 @@ export function SettingsForm() {
               name="github_pat"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Personal Access Token (PAT)</FormLabel>
+                  <FormLabel>{t('patLabel')}</FormLabel>
                   <div className="relative">
                     <FormControl>
                       <Input
                         type={showPat ? 'text' : 'password'}
                         placeholder={
                           hasPat
-                            ? `Current token ends with ...${patHint || '****'}`
-                            : 'ghp_xxxxxxxxxxxxxxxxxxxx'
+                            ? t('patPlaceholderExisting', { hint: patHint || '****' })
+                            : t('patPlaceholderNew')
                         }
                         className="pr-10"
                         {...field}
@@ -261,7 +259,7 @@ export function SettingsForm() {
                       size="icon"
                       className="absolute right-0 top-0 h-10 w-10 text-muted-foreground hover:text-foreground"
                       onClick={() => setShowPat(!showPat)}
-                      aria-label={showPat ? 'Hide token' : 'Show token'}
+                      aria-label={showPat ? t('hideToken') : t('showToken')}
                     >
                       {showPat ? (
                         <EyeOff className="h-4 w-4" />
@@ -272,8 +270,8 @@ export function SettingsForm() {
                   </div>
                   <FormDescription>
                     {hasPat
-                      ? 'A PAT is already stored. Leave blank to keep the current token, or enter a new one to replace it.'
-                      : 'Required. Create a fine-grained PAT with "Contents: Read and write" permission on the repository.'}
+                      ? t('patDescriptionExisting')
+                      : t('patDescriptionNew')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -285,12 +283,12 @@ export function SettingsForm() {
               name="dev_branch"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Dev Branch</FormLabel>
+                  <FormLabel>{t('devBranchLabel')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="dev" {...field} />
+                    <Input placeholder={t('devBranchPlaceholder')} {...field} />
                   </FormControl>
                   <FormDescription>
-                    All commits will be pushed to this branch. Default: dev.
+                    {t('devBranchDescription')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -302,9 +300,9 @@ export function SettingsForm() {
         {/* File Paths Section */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">File Paths</CardTitle>
+            <CardTitle className="text-lg">{t('filePathsTitle')}</CardTitle>
             <CardDescription>
-              Specify the paths to configuration files within the repository.
+              {t('filePathsDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -313,16 +311,15 @@ export function SettingsForm() {
               name="instance_profile_path"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Instance Profile Path</FormLabel>
+                  <FormLabel>{t('instanceProfilePathLabel')}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="config/instance_profile"
+                      placeholder={t('instanceProfilePathPlaceholder')}
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    Path to the instance profile file in the repository (e.g.
-                    config/instance_profile).
+                    {t('instanceProfilePathDescription')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -334,13 +331,12 @@ export function SettingsForm() {
               name="rules_txt_path"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Rules.txt Path</FormLabel>
+                  <FormLabel>{t('rulesTxtPathLabel')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="config/rules.txt" {...field} />
+                    <Input placeholder={t('rulesTxtPathPlaceholder')} {...field} />
                   </FormControl>
                   <FormDescription>
-                    Path to the rules.txt file in the repository (e.g.
-                    config/rules.txt).
+                    {t('rulesTxtPathDescription')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -366,7 +362,7 @@ export function SettingsForm() {
               ) : (
                 <Plug className="mr-2 h-4 w-4" />
               )}
-              {testing ? 'Testing connection...' : 'Test Connection'}
+              {testing ? t('testingConnection') : t('testConnection')}
             </Button>
 
             <ConnectionTestResults results={testResults} />
@@ -378,8 +374,8 @@ export function SettingsForm() {
           <div className="flex items-center justify-between">
             <div className="text-xs text-muted-foreground">
               {lastUpdated
-                ? `Last saved: ${new Date(lastUpdated).toLocaleString()}`
-                : 'Not configured yet'}
+                ? t('lastSaved', { date: new Date(lastUpdated).toLocaleString() })
+                : t('notConfiguredYet')}
             </div>
             <Button type="submit" disabled={saving || testing}>
               {saving ? (
@@ -387,7 +383,7 @@ export function SettingsForm() {
               ) : (
                 <Save className="mr-2 h-4 w-4" />
               )}
-              {saving ? 'Saving...' : 'Save Settings'}
+              {saving ? t('saving') : t('saveSettings')}
             </Button>
           </div>
         </div>

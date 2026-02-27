@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
   const adminClient = createAdminClient()
   const { data: profile } = await adminClient
     .from('user_profiles')
-    .select('status, github_username')
+    .select('status, github_username, locale')
     .eq('user_id', user.id)
     .maybeSingle()
 
@@ -80,6 +80,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}/login?error=deactivated`)
   }
 
-  // active → Dashboard
-  return NextResponse.redirect(`${origin}${next}`)
+  // active → Dashboard — sync locale preference to cookie
+  const redirectResponse = NextResponse.redirect(`${origin}${next}`)
+  const userLocale = profile?.locale ?? 'de'
+  redirectResponse.cookies.set('NEXT_LOCALE', userLocale, {
+    path: '/',
+    maxAge: 60 * 60 * 24 * 365, // 1 year
+    sameSite: 'lax',
+  })
+  return redirectResponse
 }

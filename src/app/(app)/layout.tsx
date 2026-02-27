@@ -1,17 +1,20 @@
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { LanguageSwitcher } from '@/components/language-switcher'
 import { Button } from '@/components/ui/button'
 import { LogOut, Settings } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { MobileNav } from '@/components/mobile-nav'
+import { getTranslations } from 'next-intl/server'
 
 async function SignOutButton() {
+  const t = await getTranslations('common')
   return (
     <form action="/auth/signout" method="POST">
       <Button variant="ghost" size="sm" type="submit">
         <LogOut className="h-4 w-4 mr-2" />
-        Sign Out
+        {t('signOut')}
       </Button>
     </form>
   )
@@ -22,6 +25,7 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode
 }) {
+  const t = await getTranslations('common')
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -49,22 +53,22 @@ export default async function AppLayout({
             </Link>
             <nav className="hidden md:flex items-center gap-4">
               <Link href="/dashboard" className="uppercase tracking-wider text-xs font-bold text-gray-400 hover:text-foreground transition-colors">
-                Dashboard
+                {t('dashboard')}
               </Link>
               <Link href="/editor/instance-profile" className="uppercase tracking-wider text-xs font-bold text-gray-400 hover:text-foreground transition-colors">
-                Port Editor
+                {t('portEditor')}
               </Link>
               <Link href="/editor/rules" className="uppercase tracking-wider text-xs font-bold text-gray-400 hover:text-foreground transition-colors">
-                Rules Editor
+                {t('rulesEditor')}
               </Link>
               {isAdmin && (
                 <>
                   <Link href="/admin/users" className="uppercase tracking-wider text-xs font-bold text-gray-400 hover:text-foreground transition-colors">
-                    Users
+                    {t('users')}
                   </Link>
                   <Link href="/settings" className="uppercase tracking-wider text-xs font-bold text-gray-400 hover:text-foreground transition-colors flex items-center gap-1">
                     <Settings className="h-3.5 w-3.5" />
-                    Settings
+                    {t('settings')}
                   </Link>
                 </>
               )}
@@ -74,6 +78,7 @@ export default async function AppLayout({
             <span className="text-xs text-muted-foreground hidden sm:block">
               {user.email}
             </span>
+            <LanguageSwitcher />
             <ThemeToggle />
             <SignOutButton />
           </div>
@@ -83,7 +88,7 @@ export default async function AppLayout({
       <footer className="border-t py-4">
         <div className="container mx-auto px-4">
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">
-            consolut international ag. all rights reserved.
+            {t('footer')}
           </p>
         </div>
       </footer>

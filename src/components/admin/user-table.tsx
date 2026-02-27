@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import {
   Table,
   TableBody,
@@ -47,14 +48,6 @@ export interface UserProfile {
 
 type StatusFilter = 'all' | 'pending_approval' | 'active' | 'rejected' | 'deactivated'
 
-const STATUS_LABELS: Record<string, string> = {
-  unconfirmed: 'Unconfirmed',
-  pending_approval: 'Pending',
-  active: 'Active',
-  rejected: 'Rejected',
-  deactivated: 'Deactivated',
-}
-
 const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
   unconfirmed: 'outline',
   pending_approval: 'default',
@@ -63,10 +56,18 @@ const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'destructive' | '
   deactivated: 'outline',
 }
 
-const ROLE_LABELS: Record<string, string> = {
-  user: 'User',
-  admin: 'Admin',
-  super_admin: 'Super Admin',
+const STATUS_I18N_KEY: Record<string, string> = {
+  unconfirmed: 'statusUnconfirmed',
+  pending_approval: 'statusPending',
+  active: 'statusActive',
+  rejected: 'statusRejected',
+  deactivated: 'statusDeactivated',
+}
+
+const ROLE_I18N_KEY: Record<string, string> = {
+  user: 'roleUser',
+  admin: 'roleAdmin',
+  super_admin: 'roleSuperAdmin',
 }
 
 interface UserTableProps {
@@ -94,6 +95,8 @@ export function UserTable({
   onReactivate,
   onRoleChange,
 }: UserTableProps) {
+  const t = useTranslations('admin')
+  const tc = useTranslations('common')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [actionLoading, setActionLoading] = useState<string | null>(null)
@@ -156,7 +159,7 @@ export function UserTable({
   if (error) {
     return (
       <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-6 text-center">
-        <p className="text-sm text-destructive font-medium">Failed to load users</p>
+        <p className="text-sm text-destructive font-medium">{t('failedToLoad')}</p>
         <p className="text-xs text-muted-foreground mt-1">{error}</p>
       </div>
     )
@@ -169,30 +172,30 @@ export function UserTable({
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by name, email, or GitHub username..."
+            placeholder={t('searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
             className="pl-9"
-            aria-label="Search users"
+            aria-label={t('searchLabel')}
           />
         </div>
         <Select
           value={statusFilter}
           onValueChange={handleStatusFilterChange}
         >
-          <SelectTrigger className="w-full sm:w-[200px]" aria-label="Filter by status">
-            <SelectValue placeholder="Filter by status" />
+          <SelectTrigger className="w-full sm:w-[200px]" aria-label={t('filterByStatus')}>
+            <SelectValue placeholder={t('filterByStatus')} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">
-              All statuses
+              {t('allStatuses')}
             </SelectItem>
             <SelectItem value="pending_approval">
-              Pending ({pendingCount})
+              {t('pendingFilter', { count: pendingCount })}
             </SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="rejected">Rejected</SelectItem>
-            <SelectItem value="deactivated">Deactivated</SelectItem>
+            <SelectItem value="active">{t('activeFilter')}</SelectItem>
+            <SelectItem value="rejected">{t('rejectedFilter')}</SelectItem>
+            <SelectItem value="deactivated">{t('deactivatedFilter')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -202,7 +205,7 @@ export function UserTable({
         <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/30 px-4 py-2">
           <Users className="h-4 w-4 text-amber-600 dark:text-amber-400" />
           <span className="text-sm font-medium text-amber-800 dark:text-amber-300">
-            {pendingCount} pending registration{pendingCount > 1 ? 's' : ''} awaiting approval
+            {t('pendingRegistrations', { count: pendingCount })}
           </span>
         </div>
       )}
@@ -212,14 +215,14 @@ export function UserTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>User</TableHead>
-              <TableHead className="hidden md:table-cell">Email</TableHead>
-              <TableHead className="hidden md:table-cell">GitHub</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="hidden sm:table-cell">Role</TableHead>
-              <TableHead className="hidden lg:table-cell">Registered</TableHead>
-              <TableHead className="hidden lg:table-cell">Last Login</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>{t('user')}</TableHead>
+              <TableHead className="hidden md:table-cell">{t('emailColumn')}</TableHead>
+              <TableHead className="hidden md:table-cell">{t('githubColumn')}</TableHead>
+              <TableHead>{t('statusColumn')}</TableHead>
+              <TableHead className="hidden sm:table-cell">{t('roleColumn')}</TableHead>
+              <TableHead className="hidden lg:table-cell">{t('registeredColumn')}</TableHead>
+              <TableHead className="hidden lg:table-cell">{t('lastLoginColumn')}</TableHead>
+              <TableHead className="text-right">{t('actionsColumn')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -241,8 +244,8 @@ export function UserTable({
                 <TableCell colSpan={8} className="h-24 text-center">
                   <p className="text-muted-foreground text-sm">
                     {searchQuery || statusFilter !== 'all'
-                      ? 'No users match the current filters.'
-                      : 'No users found.'}
+                      ? t('noUsersMatch')
+                      : t('noUsersFound')}
                   </p>
                 </TableCell>
               </TableRow>
@@ -263,9 +266,9 @@ export function UserTable({
                     <TableCell>
                       <div className="flex flex-col">
                         <span className="font-medium text-sm">
-                          {user.full_name || 'No name'}
+                          {user.full_name || t('noName')}
                           {isCurrentUser && (
-                            <span className="text-xs text-muted-foreground ml-1">(you)</span>
+                            <span className="text-xs text-muted-foreground ml-1">{t('you')}</span>
                           )}
                         </span>
                         <span className="text-xs text-muted-foreground md:hidden">
@@ -285,7 +288,7 @@ export function UserTable({
                     </TableCell>
                     <TableCell>
                       <Badge variant={STATUS_VARIANT[user.status] ?? 'outline'}>
-                        {STATUS_LABELS[user.status] ?? user.status}
+                        {STATUS_I18N_KEY[user.status] ? t(STATUS_I18N_KEY[user.status] as 'statusUnconfirmed' | 'statusPending' | 'statusActive' | 'statusRejected' | 'statusDeactivated') : user.status}
                       </Badge>
                       {user.status === 'rejected' && user.rejection_reason && (
                         <p className="text-xs text-muted-foreground mt-1 max-w-[200px] truncate" title={user.rejection_reason}>
@@ -304,7 +307,7 @@ export function UserTable({
                         />
                       ) : (
                         <span className="text-sm">
-                          {ROLE_LABELS[user.role] ?? user.role}
+                          {ROLE_I18N_KEY[user.role] ? t(ROLE_I18N_KEY[user.role] as 'roleUser' | 'roleAdmin' | 'roleSuperAdmin') : user.role}
                         </span>
                       )}
                     </TableCell>
@@ -327,7 +330,7 @@ export function UserTable({
                               hour: '2-digit',
                               minute: '2-digit',
                             })
-                          : 'Never'}
+                          : t('never')}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
@@ -345,7 +348,7 @@ export function UserTable({
                               aria-label={`Approve ${user.full_name || user.user_id}`}
                             >
                               <CheckCircle className="h-4 w-4 mr-1" />
-                              <span className="hidden sm:inline">Approve</span>
+                              <span className="hidden sm:inline">{t('approve')}</span>
                             </Button>
                             <Button
                               size="sm"
@@ -353,10 +356,10 @@ export function UserTable({
                               className="text-destructive hover:text-destructive hover:bg-destructive/10"
                               disabled={isLoading}
                               onClick={() => setRejectDialogUser(user)}
-                              aria-label={`Reject ${user.full_name || user.user_id}`}
+                              aria-label={`${t('reject')} ${user.full_name || user.user_id}`}
                             >
                               <XCircle className="h-4 w-4 mr-1" />
-                              <span className="hidden sm:inline">Reject</span>
+                              <span className="hidden sm:inline">{t('reject')}</span>
                             </Button>
                           </>
                         )}
@@ -370,7 +373,7 @@ export function UserTable({
                             aria-label={`Deactivate ${user.full_name || user.user_id}`}
                           >
                             <Ban className="h-4 w-4 mr-1" />
-                            <span className="hidden sm:inline">Deactivate</span>
+                            <span className="hidden sm:inline">{t('deactivate')}</span>
                           </Button>
                         )}
                         {user.status === 'deactivated' && (
@@ -385,7 +388,7 @@ export function UserTable({
                             aria-label={`Reactivate ${user.full_name || user.user_id}`}
                           >
                             <RotateCcw className="h-4 w-4 mr-1" />
-                            <span className="hidden sm:inline">Reactivate</span>
+                            <span className="hidden sm:inline">{t('reactivate')}</span>
                           </Button>
                         )}
                       </div>
@@ -402,8 +405,9 @@ export function UserTable({
       {!loading && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">
-            Showing {paginatedUsers.length} of {sortedUsers.length} users
-            {sortedUsers.length !== users.length && ` (${users.length} total)`}
+            {sortedUsers.length !== users.length
+              ? tc('showingTotal', { count: paginatedUsers.length, filtered: sortedUsers.length, total: users.length })
+              : tc('showing', { count: paginatedUsers.length, filtered: sortedUsers.length })}
           </p>
           {totalPages > 1 && (
             <div className="flex items-center gap-2">
@@ -412,21 +416,21 @@ export function UserTable({
                 size="sm"
                 disabled={safePage <= 1}
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                aria-label="Previous page"
+                aria-label={tc('previous')}
               >
-                Previous
+                {tc('previous')}
               </Button>
               <span className="text-sm text-muted-foreground whitespace-nowrap">
-                Page {safePage} of {totalPages}
+                {tc('page', { current: safePage, total: totalPages })}
               </span>
               <Button
                 variant="outline"
                 size="sm"
                 disabled={safePage >= totalPages}
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                aria-label="Next page"
+                aria-label={tc('next')}
               >
-                Next
+                {tc('next')}
               </Button>
             </div>
           )}

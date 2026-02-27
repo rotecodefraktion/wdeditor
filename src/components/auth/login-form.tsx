@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import Link from 'next/link'
 import { Loader2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -19,15 +20,20 @@ import {
 import { toast } from 'sonner'
 import { StatusBanner } from './status-banner'
 
-const schema = z.object({
-  email: z.string().email('Please enter a valid email address.'),
-  password: z.string().min(1, 'Password is required.'),
-})
-
-type FormValues = z.infer<typeof schema>
+type FormValues = {
+  email: string
+  password: string
+}
 
 export function LoginForm({ initialError }: { initialError?: string | null }) {
+  const t = useTranslations('auth')
+  const tv = useTranslations('validation')
   const [statusError, setStatusError] = useState<string | null>(initialError ?? null)
+
+  const schema = z.object({
+    email: z.string().email(tv('emailRequired')),
+    password: z.string().min(1, tv('passwordRequired')),
+  })
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -54,7 +60,7 @@ export function LoginForm({ initialError }: { initialError?: string | null }) {
         return
       }
 
-      toast.success('Signed in successfully.')
+      toast.success(t('signedInSuccess'))
       window.location.href = '/dashboard'
     } catch {
       setStatusError('server_error')
@@ -71,9 +77,9 @@ export function LoginForm({ initialError }: { initialError?: string | null }) {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t('email')}</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder="admin@example.com" {...field} />
+                  <Input type="email" placeholder={t('emailPlaceholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -85,16 +91,16 @@ export function LoginForm({ initialError }: { initialError?: string | null }) {
             render={({ field }) => (
               <FormItem>
                 <div className="flex items-center justify-between">
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>{t('password')}</FormLabel>
                   <Link
                     href="/login/forgot-password"
                     className="text-xs text-muted-foreground hover:text-foreground"
                   >
-                    Forgot password?
+                    {t('forgotPassword')}
                   </Link>
                 </div>
                 <FormControl>
-                  <Input type="password" placeholder="••••••••" {...field} />
+                  <Input type="password" placeholder={t('passwordPlaceholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -108,7 +114,7 @@ export function LoginForm({ initialError }: { initialError?: string | null }) {
             {form.formState.isSubmitting && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             )}
-            Sign In
+            {t('signIn')}
           </Button>
         </form>
       </Form>

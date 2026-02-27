@@ -3,35 +3,10 @@ import { UnconfiguredBanner } from '@/components/settings/unconfigured-banner'
 import { GitHubAccessWarning } from '@/components/github/github-access-warning'
 import { createClient } from '@/lib/supabase/server'
 import { FeatureCard } from '@/components/dashboard/feature-card'
-
-const features = [
-  {
-    title: 'Instance Profile Port Editor',
-    description: 'Manage icm/server_port_* parameters with validation and conflict detection.',
-    icon: <Settings className="h-5 w-5" />,
-    href: '/editor/instance-profile',
-    status: 'Available',
-    enabled: true,
-  },
-  {
-    title: 'Rules.txt Rewrite Editor',
-    description: 'Edit URL rewrite rules for routing and redirection.',
-    icon: <FileText className="h-5 w-5" />,
-    href: '/editor/rules',
-    status: 'Available',
-    enabled: true,
-  },
-  {
-    title: 'User Management',
-    description: 'Approve or reject user access requests and manage team members.',
-    icon: <Users className="h-5 w-5" />,
-    href: '/admin/users',
-    status: 'Available',
-    enabled: true,
-  },
-]
+import { getTranslations } from 'next-intl/server'
 
 export default async function DashboardPage() {
+  const t = await getTranslations('dashboard')
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -45,12 +20,39 @@ export default async function DashboardPage() {
     userRole = profile?.role
   }
 
+  const features = [
+    {
+      title: t('portEditorTitle'),
+      description: t('portEditorDescription'),
+      icon: <Settings className="h-5 w-5" />,
+      href: '/editor/instance-profile',
+      status: t('available'),
+      enabled: true,
+    },
+    {
+      title: t('rulesEditorTitle'),
+      description: t('rulesEditorDescription'),
+      icon: <FileText className="h-5 w-5" />,
+      href: '/editor/rules',
+      status: t('available'),
+      enabled: true,
+    },
+    {
+      title: t('userManagementTitle'),
+      description: t('userManagementDescription'),
+      icon: <Users className="h-5 w-5" />,
+      href: '/admin/users',
+      status: t('available'),
+      enabled: true,
+    },
+  ]
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-black tracking-tight">Dashboard</h1>
+        <h1 className="text-3xl font-black tracking-tight">{t('title')}</h1>
         <p className="text-muted-foreground">
-          Welcome to the SAP Web Dispatcher configuration editor.
+          {t('welcome')}
         </p>
       </div>
 

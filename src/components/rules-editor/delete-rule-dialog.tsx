@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,24 +26,25 @@ export function DeleteRuleDialog({
   rule,
   onConfirm,
 }: DeleteRuleDialogProps) {
+  const t = useTranslations('rulesEditor')
+  const tc = useTranslations('common')
   if (!rule) return null
 
   const description = rule.comment
-    ? `"${rule.comment}" (Port ${rule.port ?? 'global'})`
-    : `Regel fuer Port ${rule.port ?? 'global'}`
+    ? t('deleteRuleDescriptionNamed', { comment: rule.comment, port: String(rule.port ?? 'global') })
+    : t('deleteRuleDescriptionPort', { port: String(rule.port ?? 'global') })
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Regel loeschen?</AlertDialogTitle>
+          <AlertDialogTitle>{t('deleteRuleTitle')}</AlertDialogTitle>
           <AlertDialogDescription>
-            Soll die Regel {description} wirklich geloescht werden?
-            Die Regel wird vollstaendig aus der Datei entfernt (inkl. Kommentarzeile).
+            {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+          <AlertDialogCancel>{tc('cancel')}</AlertDialogCancel>
           <AlertDialogAction
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             onClick={() => {
@@ -50,7 +52,7 @@ export function DeleteRuleDialog({
               onOpenChange(false)
             }}
           >
-            Loeschen
+            {tc('delete')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

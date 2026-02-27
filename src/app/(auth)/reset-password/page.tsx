@@ -1,14 +1,16 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { NewPasswordForm } from '@/components/auth/new-password-form'
+import { getTranslations } from 'next-intl/server'
 
-export default function ResetPasswordPage() {
+export default async function ResetPasswordPage() {
+  const t = await getTranslations('auth')
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Set New Password</CardTitle>
+        <CardTitle>{t('setNewPasswordTitle')}</CardTitle>
         <CardDescription>
-          Enter a new password for your account. The password must be at least 8
-          characters long.
+          {t('setNewPasswordDescription')}
         </CardDescription>
       </CardHeader>
       <CardContent>

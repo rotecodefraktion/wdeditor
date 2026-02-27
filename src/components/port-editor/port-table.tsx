@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { useTranslations } from 'next-intl'
 import type { PortEntry } from '@/lib/port-parser'
 
 interface PortTableProps {
@@ -31,23 +32,25 @@ export function PortTable({
   onDelete,
   onAdd,
 }: PortTableProps) {
+  const t = useTranslations('portEditor')
+  const tc = useTranslations('common')
+
   if (entries.length === 0) {
     return (
       <div className="rounded-md border p-8 text-center space-y-4">
         <p className="text-muted-foreground">
-          Keine <code className="text-xs bg-muted px-1 py-0.5 rounded">icm/server_port_*</code> Eintraege gefunden.
+          {t('noEntries', { code: 'icm/server_port_*' })}
         </p>
         {!readOnly && (
           <Button onClick={onAdd} size="sm">
             <Plus className="h-4 w-4 mr-1" />
-            Ersten Port hinzufuegen
+            {t('addFirstPort')}
           </Button>
         )}
       </div>
     )
   }
 
-  // Sort entries by index
   const sortedEntries = [...entries].sort((a, b) => a.index - b.index)
 
   return (
@@ -56,12 +59,12 @@ export function PortTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-16">Index</TableHead>
-              <TableHead className="w-24">PROT</TableHead>
-              <TableHead className="w-24">PORT</TableHead>
-              <TableHead className="w-24">TIMEOUT</TableHead>
-              <TableHead>Weitere Parameter</TableHead>
-              {!readOnly && <TableHead className="w-32 text-right">Aktionen</TableHead>}
+              <TableHead className="w-16">{t('index')}</TableHead>
+              <TableHead className="w-24">{t('protocol')}</TableHead>
+              <TableHead className="w-24">{t('port')}</TableHead>
+              <TableHead className="w-24">{t('timeout')}</TableHead>
+              <TableHead>{t('additionalParams')}</TableHead>
+              {!readOnly && <TableHead className="w-32 text-right">{t('actions')}</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -81,7 +84,7 @@ export function PortTable({
       {!readOnly && (
         <Button onClick={onAdd} variant="outline" size="sm">
           <Plus className="h-4 w-4 mr-1" />
-          Neuer Port
+          {t('newPort')}
         </Button>
       )}
     </div>
@@ -101,9 +104,10 @@ function PortTableRow({
   onDuplicate: (entry: PortEntry) => void
   onDelete: (entry: PortEntry) => void
 }) {
+  const t = useTranslations('portEditor')
+  const tc = useTranslations('common')
   const isRaw = entry.rawLine !== null
 
-  // Build "additional params" display
   const additionalParams: string[] = []
   if (entry.host) additionalParams.push(`HOST=${entry.host}`)
   if (entry.prot === 'HTTPS') {
@@ -117,7 +121,6 @@ function PortTableRow({
   }
 
   if (isRaw) {
-    // Unparseable entry - show as raw text with warning
     return (
       <TableRow className="bg-yellow-50/50 dark:bg-yellow-950/10">
         <TableCell className="font-mono text-sm">{entry.index}</TableCell>
@@ -129,7 +132,7 @@ function PortTableRow({
             </code>
           </div>
           <p className="text-xs text-yellow-600 mt-1">
-            Unbekanntes Format -- nicht strukturiert bearbeitbar
+            {t('unknownFormat')}
           </p>
         </TableCell>
       </TableRow>
@@ -178,11 +181,11 @@ function PortTableRow({
                   <TooltipTrigger>
                     <Badge variant="outline" className="text-yellow-600 border-yellow-400">
                       <AlertTriangle className="h-3 w-3 mr-1" />
-                      {entry.unknownKeys.length} unbekannt
+                      {t('unknownParamsBadge', { count: entry.unknownKeys.length })}
                     </Badge>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Unbekannte Parameter: {entry.unknownKeys.join(', ')}</p>
+                    <p>{t('unknownParams', { keys: entry.unknownKeys.join(', ') })}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -200,12 +203,12 @@ function PortTableRow({
                       size="icon"
                       className="h-8 w-8"
                       onClick={(e) => { e.stopPropagation(); onEdit(entry) }}
-                      aria-label={`Port ${entry.port} bearbeiten`}
+                      aria-label={`${tc('edit')} Port ${entry.port}`}
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>Bearbeiten</TooltipContent>
+                  <TooltipContent>{tc('edit')}</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
               <TooltipProvider>
@@ -216,12 +219,12 @@ function PortTableRow({
                       size="icon"
                       className="h-8 w-8"
                       onClick={(e) => { e.stopPropagation(); onDuplicate(entry) }}
-                      aria-label={`Port ${entry.port} duplizieren`}
+                      aria-label={`${tc('duplicate')} Port ${entry.port}`}
                     >
                       <Copy className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>Duplizieren</TooltipContent>
+                  <TooltipContent>{tc('duplicate')}</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
               <TooltipProvider>
@@ -232,12 +235,12 @@ function PortTableRow({
                       size="icon"
                       className="h-8 w-8 text-destructive hover:text-destructive"
                       onClick={(e) => { e.stopPropagation(); onDelete(entry) }}
-                      aria-label={`Port ${entry.port} loeschen`}
+                      aria-label={`${tc('delete')} Port ${entry.port}`}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>Loeschen</TooltipContent>
+                  <TooltipContent>{tc('delete')}</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </div>

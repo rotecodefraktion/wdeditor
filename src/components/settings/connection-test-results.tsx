@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { CheckCircle, AlertTriangle, XCircle } from 'lucide-react'
 import type { ConnectionCheckResult } from '@/lib/settings-schema'
 
@@ -26,6 +27,7 @@ const statusConfig = {
 }
 
 export function ConnectionTestResults({ results }: ConnectionTestResultsProps) {
+  const t = useTranslations('settings')
   if (results.length === 0) return null
 
   return (

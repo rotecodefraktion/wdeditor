@@ -27,6 +27,7 @@ import { validateRulesText } from '@/lib/rules-validator'
 import { parseInstanceProfile } from '@/lib/port-parser'
 import type { GitHubFileResponse, GitHubCommitResponse } from '@/lib/github-schema'
 import { createClient } from '@/lib/supabase'
+import { useTranslations } from 'next-intl'
 
 // Lazy import CodeMirror to avoid SSR issues
 import dynamic from 'next/dynamic'
@@ -51,6 +52,10 @@ interface LockState {
 }
 
 export default function RulesEditorPage() {
+  const t = useTranslations('rulesEditor')
+  const tc = useTranslations('common')
+  const tPort = useTranslations('portEditor')
+
   // Auth/role state
   const [isAdmin, setIsAdmin] = useState(false)
 
@@ -135,11 +140,11 @@ export default function RulesEditorPage() {
         if (data.code === 'FILE_NOT_FOUND') {
           setErrorCode('FILE_NOT_FOUND')
           setErrorMessage(
-            `Datei nicht gefunden: ${data.error}. Bitte pruefen Sie die Settings.`
+            t('fileNotFound', { error: data.error })
           )
         } else {
           setErrorCode(null)
-          setErrorMessage(data.error || 'rules.txt konnte nicht geladen werden.')
+          setErrorMessage(data.error || t('fileLoadError'))
         }
 
         // Parse instance profile for port list even on file error (needed for create-file flow)
@@ -219,15 +224,15 @@ export default function RulesEditorPage() {
           isLockedByOther: false,
           lockError: lockErrorMsg,
         })
-        toast.error('Lock konnte nicht erworben werden. Nur-Lesen-Modus aktiv.')
+        toast.error(t('fileLoadError'))
       }
 
       setPageState('ready')
     } catch {
-      setErrorMessage('Netzwerkfehler beim Laden der Datei.')
+      setErrorMessage(t('networkError'))
       setPageState('error')
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     loadFile()
@@ -436,7 +441,9 @@ export default function RulesEditorPage() {
     setRules((prev) => prev.filter((r) => r.id !== rule.id))
     setIsDirty(true)
     toast.success(
-      `Regel ${rule.comment ? `"${rule.comment}"` : `fuer Port ${rule.port ?? 'global'}`} geloescht.`
+      rule.comment
+        ? t('ruleDeleted', { name: rule.comment })
+        : t('ruleDeletedPort', { port: rule.port ?? 'global' })
     )
   }
 
@@ -485,17 +492,17 @@ export default function RulesEditorPage() {
           setLockState({
             isLocked: false,
             isLockedByOther: false,
-            lockError: 'Lock konnte nach dem Commit nicht erneut erworben werden. Bitte Seite neu laden.',
+            lockError: t('fileLoadError'),
           })
-          toast.error('Lock konnte nach dem Commit nicht erneut erworben werden.')
+          toast.error(t('fileLoadError'))
         }
       } catch {
         setLockState({
           isLocked: false,
           isLockedByOther: false,
-          lockError: 'Netzwerkfehler beim Lock-Erwerb. Bitte Seite neu laden.',
+          lockError: t('networkError'),
         })
-        toast.error('Netzwerkfehler beim Lock-Erwerb nach dem Commit.')
+        toast.error(t('networkError'))
       }
     }, 500)
   }
@@ -587,26 +594,26 @@ export default function RulesEditorPage() {
           <Button variant="ghost" size="sm" asChild>
             <Link href="/dashboard">
               <ArrowLeft className="h-4 w-4 mr-1" />
-              Dashboard
+              {tc('backToDashboard')}
             </Link>
           </Button>
           <h1 className="text-3xl font-black tracking-tight">
-            Rules.txt Rewrite Editor
+            {t('title')}
           </h1>
         </div>
         <Alert variant="destructive">
-          <AlertTitle>Fehler</AlertTitle>
+          <AlertTitle>{tc('error')}</AlertTitle>
           <AlertDescription className="space-y-3">
             <p>{errorMessage}</p>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={loadFile}>
                 <RefreshCw className="h-4 w-4 mr-1" />
-                Erneut versuchen
+                {tc('retry')}
               </Button>
               {errorCode === 'FILE_NOT_FOUND' && (
                 <Button variant="outline" size="sm" onClick={handleCreateEmptyFile}>
                   <FilePlus className="h-4 w-4 mr-1" />
-                  Leere Datei anlegen
+                  {t('createEmptyFile')}
                 </Button>
               )}
             </div>
@@ -624,15 +631,15 @@ export default function RulesEditorPage() {
           <Button variant="ghost" size="sm" asChild>
             <Link href="/dashboard">
               <ArrowLeft className="h-4 w-4 mr-1" />
-              Dashboard
+              {tc('backToDashboard')}
             </Link>
           </Button>
           <div>
             <h1 className="text-3xl font-black tracking-tight">
-              Rules.txt Rewrite Editor
+              {t('title')}
             </h1>
             <p className="text-sm text-muted-foreground">
-              Verwalte URL-Rewrite-Regeln fuer Routing und Weiterleitung
+              {t('subtitle')}
             </p>
           </div>
         </div>
@@ -641,10 +648,10 @@ export default function RulesEditorPage() {
             variant="outline"
             size="sm"
             onClick={loadFile}
-            aria-label="Datei neu laden"
+            aria-label={t('reload')}
           >
             <RefreshCw className="h-4 w-4 mr-1" />
-            Neu laden
+            {t('reload')}
           </Button>
           {!readOnly && (
             <Button
@@ -667,7 +674,7 @@ export default function RulesEditorPage() {
               disabled={!isDirty}
             >
               <Save className="h-4 w-4 mr-1" />
-              Aenderungen speichern
+              {t('saveChanges')}
             </Button>
           )}
         </div>
@@ -690,7 +697,7 @@ export default function RulesEditorPage() {
       {parseWarnings.length > 0 && (
         <Alert className="border-orange-500/50 bg-orange-50 dark:bg-orange-950/30">
           <AlertTitle className="text-orange-800 dark:text-orange-200">
-            Parse-Warnungen
+            {t('parseWarnings')}
           </AlertTitle>
           <AlertDescription className="text-orange-700 dark:text-orange-300">
             <ul className="list-disc list-inside text-sm space-y-1">
@@ -713,14 +720,14 @@ export default function RulesEditorPage() {
                 {lastCommit.sha.slice(0, 8)}
               </Badge>
               <span className="text-muted-foreground text-xs">
-                {lastCommit.author} -- {lastCommit.date ? new Date(lastCommit.date).toLocaleString('de-DE') : 'Unbekannt'}
+                {lastCommit.author} -- {lastCommit.date ? new Date(lastCommit.date).toLocaleString('de-DE') : tc('unknown')}
               </span>
               <span className="text-muted-foreground text-xs font-mono">
                 {filePath}
               </span>
               {isDirty && (
                 <Badge variant="secondary" className="text-xs">
-                  Ungespeicherte Aenderungen
+                  {tPort('unsavedChanges')}
                 </Badge>
               )}
             </CardTitle>
@@ -732,8 +739,8 @@ export default function RulesEditorPage() {
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <div className="flex items-center justify-between">
           <TabsList>
-            <TabsTrigger value="structured">Strukturierte Ansicht</TabsTrigger>
-            <TabsTrigger value="raw">Raw-Text</TabsTrigger>
+            <TabsTrigger value="structured">{t('structuredView')}</TabsTrigger>
+            <TabsTrigger value="raw">{t('rawText')}</TabsTrigger>
           </TabsList>
 
           {activeTab === 'structured' && !readOnly && (
@@ -743,12 +750,12 @@ export default function RulesEditorPage() {
               disabled={availablePorts.length === 0}
               title={
                 availablePorts.length === 0
-                  ? 'Keine Ports im Instance Profile konfiguriert. Bitte zuerst Ports anlegen.'
+                  ? t('noPortsTooltip')
                   : undefined
               }
             >
               <Plus className="h-4 w-4 mr-1" />
-              Neue Regel
+              {t('newRule')}
             </Button>
           )}
         </div>
@@ -757,11 +764,19 @@ export default function RulesEditorPage() {
         {availablePorts.length === 0 && activeTab === 'structured' && (
           <Alert className="mt-4">
             <AlertDescription className="text-sm">
-              Keine Ports im Instance Profile konfiguriert. Bitte zuerst im{' '}
-              <Link href="/editor/instance-profile" className="underline font-medium">
-                Port Editor
-              </Link>{' '}
-              Ports anlegen, bevor neue Regeln erstellt werden.
+              {(() => {
+                const text = t('noPortsWarning', { link: '{{LINK}}' })
+                const parts = text.split('{{LINK}}')
+                return (
+                  <>
+                    {parts[0]}
+                    <Link href="/editor/instance-profile" className="underline font-medium">
+                      {t('portEditorLink')}
+                    </Link>
+                    {parts[1]}
+                  </>
+                )
+              })()}
             </AlertDescription>
           </Alert>
         )}
@@ -771,7 +786,7 @@ export default function RulesEditorPage() {
           {sortedAllPorts.length === 0 && globalRules.length === 0 && (
             <div className="text-center py-12 text-muted-foreground">
               <p className="text-sm">
-                Keine Regeln vorhanden. Fuege die erste Regel hinzu.
+                {t('noRules')}
               </p>
             </div>
           )}
@@ -822,8 +837,8 @@ export default function RulesEditorPage() {
           </div>
           <p className="text-xs text-muted-foreground mt-2">
             {readOnly
-              ? 'Nur-Lesen-Modus. Aenderungen im Raw-Text sind deaktiviert.'
-              : 'Aenderungen im Raw-Text werden beim Tab-Wechsel automatisch geparsed.'}
+              ? t('readOnlyRawText')
+              : t('rawTextHint')}
           </p>
         </TabsContent>
       </Tabs>

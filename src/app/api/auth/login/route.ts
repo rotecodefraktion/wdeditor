@@ -96,11 +96,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Step 2: Check user_profiles status using admin client
+    // Step 2: Check user_profiles status and locale using admin client
     const adminClient = createAdminClient()
     const { data: profile } = await adminClient
       .from('user_profiles')
-      .select('status')
+      .select('status, locale')
       .eq('user_id', authData.user.id)
       .single()
 
@@ -120,6 +120,15 @@ export async function POST(request: NextRequest) {
     pendingCookies.forEach(({ name, value, options }) => {
       response.cookies.set(name, value, options as Record<string, string>)
     })
+
+    // Sync locale preference from profile to NEXT_LOCALE cookie
+    const userLocale = profile?.locale ?? 'de'
+    response.cookies.set('NEXT_LOCALE', userLocale, {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 365, // 1 year
+      sameSite: 'lax',
+    })
+
     return response
   } catch (error) {
     console.error('[POST /api/auth/login] Unhandled error:', error)

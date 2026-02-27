@@ -1,24 +1,29 @@
+'use client'
+
 import { AlertCircle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-
-const STATUS_MESSAGES: Record<string, string> = {
-  unconfirmed: 'Please confirm your email address before signing in.',
-  pending_approval: 'Your account is pending administrator approval.',
-  rejected: 'Your access request has been rejected. Please contact an administrator.',
-  deactivated: 'Your account has been deactivated. Please contact an administrator.',
-  invalid_credentials: 'Invalid email or password.',
-  server_error: 'An unexpected error occurred. Please try again later.',
-  unknown_status: 'Your account status could not be determined. Please contact an administrator.',
-}
+import { useTranslations } from 'next-intl'
 
 interface StatusBannerProps {
   status: string | null
 }
 
 export function StatusBanner({ status }: StatusBannerProps) {
+  const t = useTranslations('status')
+
   if (!status) return null
 
-  const message = STATUS_MESSAGES[status] ?? 'An error occurred. Please try again.'
+  const knownStatuses = [
+    'unconfirmed',
+    'pending_approval',
+    'rejected',
+    'deactivated',
+    'invalid_credentials',
+    'server_error',
+    'unknown_status',
+  ]
+
+  const message = knownStatuses.includes(status) ? t(status as never) : t('default')
 
   return (
     <Alert variant="destructive">

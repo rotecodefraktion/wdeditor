@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { Loader2, GitCommit, FilePlus, AlertTriangle } from 'lucide-react'
 import {
   Dialog,
@@ -46,6 +47,8 @@ export function CommitModal({
   defaultMessage,
   onCommitSuccess,
 }: CommitModalProps) {
+  const t = useTranslations('github')
+  const tc = useTranslations('common')
   const [commitMessage, setCommitMessage] = useState(defaultMessage ?? '')
   const [isCommitting, setIsCommitting] = useState(false)
 
@@ -62,7 +65,7 @@ export function CommitModal({
 
   async function handleCommit(force = false, createNew = false) {
     if (!commitMessage.trim()) {
-      toast.error('Please enter a commit message.')
+      toast.error(t('commitMessageRequired'))
       return
     }
 
@@ -102,14 +105,14 @@ export function CommitModal({
       if (!res.ok) {
         // BUG-11: Retry option for timeouts and network errors
         if (data.code === 'TIMEOUT' || data.code === 'NETWORK_ERROR') {
-          toast.error(data.error || 'Request failed.', {
+          toast.error(data.error || t('commitFailed'), {
             action: {
-              label: 'Erneut versuchen',
+              label: t('retryLabel'),
               onClick: () => handleCommit(force, createNew),
             },
           })
         } else {
-          toast.error(data.error || 'Commit failed.')
+          toast.error(data.error || t('commitFailed'))
         }
         setIsCommitting(false)
         return
@@ -118,7 +121,7 @@ export function CommitModal({
       // Success
       const result = data as GitHubCommitResponse
       toast.success(
-        createNew ? 'Datei neu angelegt und committed.' : 'Commit erfolgreich erstellt.',
+        createNew ? t('fileCreatedAndCommitted') : t('commitSuccess'),
         { description: `SHA: ${result.commit_sha.slice(0, 8)}` }
       )
       setCommitMessage('')
@@ -127,9 +130,9 @@ export function CommitModal({
       onOpenChange(false)
       onCommitSuccess(result)
     } catch {
-      toast.error('Netzwerkfehler.', {
+      toast.error(t('networkError'), {
         action: {
-          label: 'Erneut versuchen',
+          label: t('retryLabel'),
           onClick: () => handleCommit(force, createNew),
         },
       })
@@ -152,10 +155,10 @@ export function CommitModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <GitCommit className="h-5 w-5" />
-            Änderungen committen
+            {t('commitTitle')}
           </DialogTitle>
           <DialogDescription>
-            Überprüfe deine Änderungen und erstelle einen Commit in den Dev-Branch.
+            {t('commitDescription')}
           </DialogDescription>
         </DialogHeader>
 
@@ -163,7 +166,7 @@ export function CommitModal({
           {/* Diff View */}
           <div>
             <Label className="text-sm font-medium mb-2 block">
-              Änderungen
+              {t('changesLabel')}
             </Label>
             <DiffViewer
               original={originalContent}
@@ -176,10 +179,10 @@ export function CommitModal({
           {fileDeleted && (
             <Alert className="border-orange-500 bg-orange-50 dark:bg-orange-950/20">
               <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>Datei gelöscht</AlertTitle>
+              <AlertTitle>{t('fileDeletedTitle')}</AlertTitle>
               <AlertDescription className="space-y-3">
                 <p>
-                  Die Datei wurde auf GitHub gelöscht. Möchtest du sie neu anlegen?
+                  {t('fileDeletedDescription')}
                 </p>
                 <div className="flex gap-2 pt-1">
                   <Button
@@ -192,7 +195,7 @@ export function CommitModal({
                     ) : (
                       <FilePlus className="mr-2 h-4 w-4" />
                     )}
-                    Datei neu anlegen
+                    {t('createFile')}
                   </Button>
                   <Button
                     variant="outline"
@@ -200,7 +203,7 @@ export function CommitModal({
                     onClick={() => setFileDeleted(false)}
                     disabled={isCommitting}
                   >
-                    Abbrechen
+                    {tc('cancel')}
                   </Button>
                 </div>
               </AlertDescription>
@@ -221,11 +224,11 @@ export function CommitModal({
           {!conflict && !fileDeleted && (
             <div>
               <Label htmlFor="commit-message" className="text-sm font-medium mb-2 block">
-                Commit Message
+                {t('commitMessage')}
               </Label>
               <Textarea
                 id="commit-message"
-                placeholder="z.B. feat: Update icm/server_port configuration"
+                placeholder={t('commitMessagePlaceholder')}
                 value={commitMessage}
                 onChange={(e) => setCommitMessage(e.target.value)}
                 rows={3}
@@ -233,7 +236,7 @@ export function CommitModal({
                 disabled={isCommitting}
               />
               <p className="text-xs text-muted-foreground mt-1">
-                {commitMessage.length}/200 — Dein Name und E-Mail werden automatisch hinzugefügt.
+                {t('commitMessageCount', { count: commitMessage.length })}
               </p>
             </div>
           )}
@@ -246,7 +249,7 @@ export function CommitModal({
               onClick={handleClose}
               disabled={isCommitting}
             >
-              Abbrechen
+              {tc('cancel')}
             </Button>
             <Button
               onClick={() => handleCommit(false)}
@@ -255,7 +258,7 @@ export function CommitModal({
               {isCommitting && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
-              Committen
+              {isCommitting ? t('committing') : t('commitButton')}
             </Button>
           </DialogFooter>
         )}

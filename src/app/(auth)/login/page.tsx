@@ -6,6 +6,7 @@ import { CheckCircle, Info } from 'lucide-react'
 import { LoginForm } from '@/components/auth/login-form'
 import { GitHubOAuthButton } from '@/components/auth/github-oauth-button'
 import { createClient } from '@/lib/supabase/server'
+import { getTranslations } from 'next-intl/server'
 
 interface LoginPageProps {
   searchParams: Promise<{ error?: string; message?: string }>
@@ -26,6 +27,7 @@ async function getUserCount(): Promise<number> {
 }
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const t = await getTranslations('auth')
   const params = await searchParams
   const errorStatus = params.error ?? null
   const message = params.message ?? null
@@ -34,9 +36,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Sign In</CardTitle>
+        <CardTitle>{t('signInTitle')}</CardTitle>
         <CardDescription>
-          Sign in to access the Web Dispatcher configuration editor.
+          {t('signInDescription')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -44,11 +46,13 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <Alert>
             <Info className="h-4 w-4" />
             <AlertDescription>
-              No admin configured yet. Please{' '}
-              <Link href="/register" className="font-medium underline hover:text-foreground">
-                register
-              </Link>{' '}
-              first to become the initial super admin.
+              {t.rich('noAdminYet', {
+                registerLink: (chunks) => (
+                  <Link href="/register" className="font-medium underline hover:text-foreground">
+                    {chunks}
+                  </Link>
+                ),
+              })}
             </AlertDescription>
           </Alert>
         )}
@@ -56,7 +60,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <Alert>
             <CheckCircle className="h-4 w-4" />
             <AlertDescription>
-              Your password has been updated. Please sign in with your new password.
+              {t('passwordResetSuccess')}
             </AlertDescription>
           </Alert>
         )}
@@ -66,14 +70,14 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             <Separator />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground">or</span>
+            <span className="bg-card px-2 text-muted-foreground">{t('or', { ns: 'common' })}</span>
           </div>
         </div>
-        <GitHubOAuthButton label="Sign In with GitHub" />
+        <GitHubOAuthButton label={t('signInWithGitHub')} />
         <p className="text-center text-sm text-muted-foreground">
-          Don&apos;t have an account?{' '}
+          {t('noAccount')}{' '}
           <Link href="/register" className="underline hover:text-foreground">
-            Register
+            {t('register')}
           </Link>
         </p>
       </CardContent>

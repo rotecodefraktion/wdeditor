@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 
 interface FeatureCardProps {
@@ -23,6 +24,7 @@ export function FeatureCard({
   status,
   enabled,
 }: FeatureCardProps) {
+  const t = useTranslations('common')
   const shouldReduceMotion = useReducedMotion()
 
   return (
@@ -44,7 +46,7 @@ export function FeatureCard({
       </div>
       <div className="p-6 pt-0 mt-auto">
         <Button variant="outline" size="sm" className="w-full" asChild disabled={!enabled}>
-          <Link href={href}>Open</Link>
+          <Link href={href}>{t('open')}</Link>
         </Button>
       </div>
     </motion.div>

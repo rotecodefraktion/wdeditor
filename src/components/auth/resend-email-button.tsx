@@ -2,17 +2,19 @@
 
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 
 export function ResendEmailButton({ email }: { email?: string }) {
+  const t = useTranslations('auth')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
 
   async function handleResend() {
     if (!email) {
-      toast.error('Email address not found. Please register again.')
+      toast.error(t('emailNotFound'))
       return
     }
     setLoading(true)
@@ -29,7 +31,7 @@ export function ResendEmailButton({ email }: { email?: string }) {
       return
     }
     setSent(true)
-    toast.success('Confirmation email sent.')
+    toast.success(t('confirmationEmailSent'))
   }
 
   return (
@@ -40,7 +42,7 @@ export function ResendEmailButton({ email }: { email?: string }) {
       className="w-full"
     >
       {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-      {sent ? 'Email sent' : 'Resend confirmation email'}
+      {sent ? t('emailSent') : t('resendEmail')}
     </Button>
   )
 }

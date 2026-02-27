@@ -33,6 +33,7 @@ import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 import { PROTOCOLS, KNOWN_PORT_KEYS } from '@/lib/port-parser'
 import type { PortEntry } from '@/lib/port-parser'
 
@@ -53,27 +54,20 @@ interface PortFormProps {
   rulesWarning?: string | null
 }
 
-const portFormSchema = z.object({
-  prot: z.string().min(1, 'Protokoll ist erforderlich'),
-  port: z
-    .string()
-    .min(1, 'Port ist erforderlich')
-    .refine((val) => {
-      const num = parseInt(val, 10)
-      return !isNaN(num) && num >= 1 && num <= 65535
-    }, 'Port muss zwischen 1 und 65535 liegen'),
+// Schema is created inside the component to access translations
+// This is the type definition only
+const portFormSchemaBase = z.object({
+  prot: z.string(),
+  port: z.string(),
   timeout: z.string().optional(),
   host: z.string().optional(),
   vclient: z.string().optional(),
   sslconfig: z.string().optional(),
   extraParams: z.string().optional(),
-  comment: z
-    .string()
-    .max(200, 'Kommentar darf maximal 200 Zeichen lang sein')
-    .optional(),
+  comment: z.string().optional(),
 })
 
-export type PortFormValues = z.infer<typeof portFormSchema>
+export type PortFormValues = z.infer<typeof portFormSchemaBase>
 
 export function PortForm({
   open,
@@ -84,6 +78,30 @@ export function PortForm({
   onSubmit,
   rulesWarning,
 }: PortFormProps) {
+  const t = useTranslations('portEditor')
+  const tc = useTranslations('common')
+  const tv = useTranslations('validation')
+
+  const portFormSchema = z.object({
+    prot: z.string().min(1, tv('protocolRequired')),
+    port: z
+      .string()
+      .min(1, tv('portRequired'))
+      .refine((val) => {
+        const num = parseInt(val, 10)
+        return !isNaN(num) && num >= 1 && num <= 65535
+      }, tv('portRange')),
+    timeout: z.string().optional(),
+    host: z.string().optional(),
+    vclient: z.string().optional(),
+    sslconfig: z.string().optional(),
+    extraParams: z.string().optional(),
+    comment: z
+      .string()
+      .max(200, tv('commentMaxLength'))
+      .optional(),
+  })
+
   const form = useForm<PortFormValues>({
     resolver: zodResolver(portFormSchema),
     defaultValues: {

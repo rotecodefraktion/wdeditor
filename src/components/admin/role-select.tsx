@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import {
   Select,
   SelectContent,
@@ -15,19 +16,20 @@ interface RoleSelectProps {
 }
 
 export function RoleSelect({ currentRole, disabled, onRoleChange }: RoleSelectProps) {
+  const t = useTranslations('admin')
   return (
     <Select
       value={currentRole}
       onValueChange={onRoleChange}
       disabled={disabled}
     >
-      <SelectTrigger className="w-[130px] h-8 text-xs" aria-label="Change user role">
+      <SelectTrigger className="w-[130px] h-8 text-xs" aria-label={t('changeRole')}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="user">User</SelectItem>
-        <SelectItem value="admin">Admin</SelectItem>
-        <SelectItem value="super_admin">Super Admin</SelectItem>
+        <SelectItem value="user">{t('roleUser')}</SelectItem>
+        <SelectItem value="admin">{t('roleAdmin')}</SelectItem>
+        <SelectItem value="super_admin">{t('roleSuperAdmin')}</SelectItem>
       </SelectContent>
     </Select>
   )

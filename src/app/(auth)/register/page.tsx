@@ -3,22 +3,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator'
 import { RegistrationForm } from '@/components/auth/registration-form'
 import { GitHubOAuthButton } from '@/components/auth/github-oauth-button'
+import { getTranslations } from 'next-intl/server'
 
 interface RegisterPageProps {
   searchParams: Promise<{ github?: string }>
 }
 
 export default async function RegisterPage({ searchParams }: RegisterPageProps) {
+  const t = await getTranslations('auth')
+  const tc = await getTranslations('common')
   const params = await searchParams
   const defaultGithubUsername = params.github ?? ''
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Create Account</CardTitle>
+        <CardTitle>{t('createAccountTitle')}</CardTitle>
         <CardDescription>
-          Register to request access to the Web Dispatcher Editor. An administrator
-          must approve your account before you can sign in.
+          {t('createAccountDescription')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -28,14 +30,14 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
             <Separator />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground">or</span>
+            <span className="bg-card px-2 text-muted-foreground">{tc('or')}</span>
           </div>
         </div>
-        <GitHubOAuthButton label="Register with GitHub" />
+        <GitHubOAuthButton label={t('registerWithGitHub')} />
         <p className="text-center text-sm text-muted-foreground">
-          Already have an account?{' '}
+          {t('alreadyHaveAccount')}{' '}
           <Link href="/login" className="underline hover:text-foreground">
-            Sign In
+            {t('signIn')}
           </Link>
         </p>
       </CardContent>

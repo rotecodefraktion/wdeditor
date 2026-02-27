@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { locales, defaultLocale, type Locale } from '@/i18n/config'
 
 const PUBLIC_PATHS = [
   '/login',
@@ -16,13 +17,42 @@ function isPublicPath(pathname: string): boolean {
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // ─── NEXT_LOCALE cookie handling ─────────────────────────────
+  const localeCookie = request.cookies.get('NEXT_LOCALE')?.value as Locale | undefined
+  let needsSetLocale = false
+  let resolvedLocale: Locale = defaultLocale
+
+  if (localeCookie && locales.includes(localeCookie)) {
+    resolvedLocale = localeCookie
+  } else {
+    needsSetLocale = true
+  }
+
+  // ─── Auth / session handling ──────────────────────────────────
+
   // Öffentliche Routen immer durchlassen
   if (isPublicPath(pathname)) {
     const { supabaseResponse } = await updateSession(request)
+    if (needsSetLocale) {
+      supabaseResponse.cookies.set('NEXT_LOCALE', resolvedLocale, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 365, // 1 year
+        sameSite: 'lax',
+      })
+    }
     return supabaseResponse
   }
 
   const { supabase, supabaseResponse, user } = await updateSession(request)
+
+  // Set NEXT_LOCALE cookie if needed
+  if (needsSetLocale) {
+    supabaseResponse.cookies.set('NEXT_LOCALE', resolvedLocale, {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: 'lax',
+    })
+  }
 
   // Keine Session → Login
   if (!user) {
@@ -41,7 +71,6 @@ export async function proxy(request: NextRequest) {
     .single()
 
   if (!profile) {
-    // Profil fehlt (sollte nicht vorkommen durch Trigger)
     const loginUrl = request.nextUrl.clone()
     loginUrl.pathname = '/login'
     return NextResponse.redirect(loginUrl)

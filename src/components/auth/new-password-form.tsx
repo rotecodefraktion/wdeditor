@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Loader2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -17,19 +18,25 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 
-const schema = z
-  .object({
-    password: z.string().min(8, 'Password must be at least 8 characters.'),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match.',
-    path: ['confirmPassword'],
-  })
-
-type FormValues = z.infer<typeof schema>
+type FormValues = {
+  password: string
+  confirmPassword: string
+}
 
 export function NewPasswordForm() {
+  const t = useTranslations('auth')
+  const tv = useTranslations('validation')
+
+  const schema = z
+    .object({
+      password: z.string().min(8, tv('passwordMinLength')),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: tv('passwordsDoNotMatch'),
+      path: ['confirmPassword'],
+    })
+
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { password: '', confirmPassword: '' },
@@ -47,7 +54,7 @@ export function NewPasswordForm() {
       return
     }
 
-    toast.success('Password updated successfully.')
+    toast.success(t('passwordUpdated'))
     window.location.href = '/login?message=password_reset'
   }
 
@@ -59,9 +66,9 @@ export function NewPasswordForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>New Password</FormLabel>
+              <FormLabel>{t('newPassword')}</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} />
+                <Input type="password" placeholder={t('passwordPlaceholder')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -72,9 +79,9 @@ export function NewPasswordForm() {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirm New Password</FormLabel>
+              <FormLabel>{t('confirmNewPassword')}</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} />
+                <Input type="password" placeholder={t('passwordPlaceholder')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -88,7 +95,7 @@ export function NewPasswordForm() {
           {form.formState.isSubmitting && (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           )}
-          Set New Password
+          {t('setNewPassword')}
         </Button>
       </form>
     </Form>

@@ -2,8 +2,10 @@ import { Mail } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ResendEmailButton } from '@/components/auth/resend-email-button'
 import { createClient } from '@/lib/supabase/server'
+import { getTranslations } from 'next-intl/server'
 
 export default async function ConfirmEmailPage() {
+  const t = await getTranslations('auth')
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -15,23 +17,19 @@ export default async function ConfirmEmailPage() {
             <Mail className="h-6 w-6 text-muted-foreground" />
           </div>
         </div>
-        <CardTitle>Check Your Email</CardTitle>
+        <CardTitle>{t('checkEmail')}</CardTitle>
         <CardDescription>
-          We&apos;ve sent a confirmation link to{' '}
-          <span className="font-medium text-foreground">
-            {user?.email ?? 'your email address'}
-          </span>
-          . Please click the link to verify your account.
+          {t('checkEmailDescription', {
+            email: user?.email ?? t('yourEmailAddress'),
+          })}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground text-center">
-          The confirmation link expires after 24 hours. If it expires, use the
-          button below to request a new one.
+          {t('confirmLinkExpiry')}
         </p>
         <p className="text-sm text-muted-foreground text-center">
-          Didn&apos;t receive the email? Check your spam folder or request a new
-          confirmation link.
+          {t('didntReceiveEmail')}
         </p>
         <ResendEmailButton email={user?.email} />
       </CardContent>

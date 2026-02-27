@@ -1,13 +1,18 @@
 import { ThemeToggle } from '@/components/theme-toggle'
+import { LanguageSwitcher } from '@/components/language-switcher'
+import { getTranslations } from 'next-intl/server'
 
-export default function AuthLayout({
+export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const t = await getTranslations('auth')
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <header className="flex justify-end p-4">
+      <header className="flex justify-end p-4 gap-2">
+        <LanguageSwitcher />
         <ThemeToggle />
       </header>
       <main className="flex-1 flex items-center justify-center p-4">
@@ -18,7 +23,7 @@ export default function AuthLayout({
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-consolut-red">WD EDITOR</span>
             </div>
             <p className="text-sm text-muted-foreground mt-3">
-              Configuration management for SAP administrators
+              {t('subtitle')}
             </p>
           </div>
           <div className="card-premium relative overflow-hidden p-6">

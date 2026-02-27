@@ -26,6 +26,7 @@ import type { PortEntry, ParseResult } from '@/lib/port-parser'
 import type { GitHubFileResponse, GitHubCommitResponse } from '@/lib/github-schema'
 import { createClient } from '@/lib/supabase'
 import { checkPortInRules } from '@/lib/rules-integrity'
+import { useTranslations } from 'next-intl'
 
 /** Heartbeat interval: 5 minutes */
 const HEARTBEAT_INTERVAL_MS = 5 * 60 * 1000
@@ -43,6 +44,9 @@ interface LockState {
 }
 
 export default function InstanceProfileEditorPage() {
+  const t = useTranslations('portEditor')
+  const tc = useTranslations('common')
+
   // Auth/role state
   const [isAdmin, setIsAdmin] = useState(false)
 
@@ -113,10 +117,10 @@ export default function InstanceProfileEditorPage() {
         const data = await fileRes.json()
         if (data.code === 'FILE_NOT_FOUND') {
           setErrorMessage(
-            `Datei nicht gefunden: ${data.error}. Bitte pruefen Sie die Settings.`
+            t('fileNotFound', { error: data.error })
           )
         } else {
-          setErrorMessage(data.error || 'Datei konnte nicht geladen werden.')
+          setErrorMessage(data.error || t('fileLoadError'))
         }
         setPageState('error')
         return
@@ -170,15 +174,15 @@ export default function InstanceProfileEditorPage() {
           isLockedByOther: false,
           lockError: lockErrorMsg,
         })
-        toast.error('Lock konnte nicht erworben werden. Nur-Lesen-Modus aktiv.')
+        toast.error(t('lockFailed'))
       }
 
       setPageState('ready')
     } catch {
-      setErrorMessage('Netzwerkfehler beim Laden der Datei.')
+      setErrorMessage(t('networkError'))
       setPageState('error')
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     loadFile()
@@ -318,7 +322,7 @@ export default function InstanceProfileEditorPage() {
         checkRulesForPort(formEntry.port).then((result) => {
           if (result && result.matchCount > 0) {
             toast.warning(
-              `Es existieren ${result.matchCount} Regeln in rules.txt fuer Port ${formEntry.port}. Diese werden nicht automatisch auf Port ${portNum} angepasst.`,
+              t('rulesWarningToast', { count: result.matchCount, oldPort: formEntry.port ?? 0, newPort: portNum }),
               { duration: 8000 }
             )
           }
@@ -348,7 +352,7 @@ export default function InstanceProfileEditorPage() {
   function handleDeleteConfirm(entry: PortEntry) {
     setPortEntries((prev) => prev.filter((e) => e.index !== entry.index))
     setIsDirty(true)
-    toast.success(`Port ${entry.index} (PORT=${entry.port}) geloescht.`)
+    toast.success(t('portDeleted', { index: entry.index, port: entry.port ?? 0 }))
   }
 
   async function checkRulesForPort(port: number) {
@@ -402,17 +406,17 @@ export default function InstanceProfileEditorPage() {
           setLockState({
             isLocked: false,
             isLockedByOther: false,
-            lockError: 'Lock konnte nach dem Commit nicht erneut erworben werden. Bitte Seite neu laden.',
+            lockError: t('lockReacquireFailed'),
           })
-          toast.error('Lock konnte nach dem Commit nicht erneut erworben werden.')
+          toast.error(t('lockReacquireFailed'))
         }
       } catch {
         setLockState({
           isLocked: false,
           isLockedByOther: false,
-          lockError: 'Netzwerkfehler beim Lock-Erwerb. Bitte Seite neu laden.',
+          lockError: t('lockNetworkError'),
         })
-        toast.error('Netzwerkfehler beim Lock-Erwerb nach dem Commit.')
+        toast.error(t('lockNetworkError'))
       }
     }, 500)
   }
@@ -509,20 +513,20 @@ export default function InstanceProfileEditorPage() {
           <Button variant="ghost" size="sm" asChild>
             <Link href="/dashboard">
               <ArrowLeft className="h-4 w-4 mr-1" />
-              Dashboard
+              {tc('backToDashboard')}
             </Link>
           </Button>
           <h1 className="text-3xl font-black tracking-tight">
-            Instance Profile Port Editor
+            {t('title')}
           </h1>
         </div>
         <Alert variant="destructive">
-          <AlertTitle>Fehler</AlertTitle>
+          <AlertTitle>{tc('error')}</AlertTitle>
           <AlertDescription className="space-y-3">
             <p>{errorMessage}</p>
             <Button variant="outline" size="sm" onClick={loadFile}>
               <RefreshCw className="h-4 w-4 mr-1" />
-              Erneut versuchen
+              {tc('retry')}
             </Button>
           </AlertDescription>
         </Alert>
@@ -538,15 +542,15 @@ export default function InstanceProfileEditorPage() {
           <Button variant="ghost" size="sm" asChild>
             <Link href="/dashboard">
               <ArrowLeft className="h-4 w-4 mr-1" />
-              Dashboard
+              {tc('backToDashboard')}
             </Link>
           </Button>
           <div>
             <h1 className="text-3xl font-black tracking-tight">
-              Instance Profile Port Editor
+              {t('title')}
             </h1>
             <p className="text-sm text-muted-foreground">
-              Verwalte <code className="text-xs bg-muted px-1 py-0.5 rounded">icm/server_port_*</code> Parameter
+              {t('subtitle', { code: t('codeLabel') })}
             </p>
           </div>
         </div>
@@ -555,10 +559,10 @@ export default function InstanceProfileEditorPage() {
             variant="outline"
             size="sm"
             onClick={loadFile}
-            aria-label="Datei neu laden"
+            aria-label={t('reloadFile')}
           >
             <RefreshCw className="h-4 w-4 mr-1" />
-            Neu laden
+            {t('reloadFile')}
           </Button>
           {!readOnly && (
             <Button
@@ -567,7 +571,7 @@ export default function InstanceProfileEditorPage() {
               disabled={!isDirty}
             >
               <Save className="h-4 w-4 mr-1" />
-              Aenderungen speichern
+              {t('saveChanges')}
             </Button>
           )}
         </div>
@@ -597,14 +601,14 @@ export default function InstanceProfileEditorPage() {
                 {lastCommit.sha.slice(0, 8)}
               </Badge>
               <span className="text-muted-foreground text-xs">
-                {lastCommit.author} -- {lastCommit.date ? new Date(lastCommit.date).toLocaleString('de-DE') : 'Unbekannt'}
+                {lastCommit.author} -- {lastCommit.date ? new Date(lastCommit.date).toLocaleString('de-DE') : tc('unknown')}
               </span>
               <span className="text-muted-foreground text-xs font-mono">
                 {filePath}
               </span>
               {isDirty && (
                 <Badge variant="secondary" className="text-xs">
-                  Ungespeicherte Aenderungen
+                  {t('unsavedChanges')}
                 </Badge>
               )}
             </CardTitle>

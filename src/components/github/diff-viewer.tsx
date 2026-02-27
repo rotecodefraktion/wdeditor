@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import { diffLines } from 'diff'
 import { ScrollArea } from '@/components/ui/scroll-area'
 
@@ -11,6 +12,7 @@ interface DiffViewerProps {
 }
 
 export function DiffViewer({ original, modified, fileName }: DiffViewerProps) {
+  const tc = useTranslations('common')
   const changes = useMemo(() => diffLines(original, modified), [original, modified])
 
   const hasChanges = changes.some((c) => c.added || c.removed)
@@ -18,7 +20,7 @@ export function DiffViewer({ original, modified, fileName }: DiffViewerProps) {
   if (!hasChanges) {
     return (
       <div className="rounded-md border p-4 text-center text-sm text-muted-foreground">
-        No changes detected.
+        {tc('noChanges')}
       </div>
     )
   }

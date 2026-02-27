@@ -4,8 +4,11 @@ import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import { UserTable, type UserProfile } from '@/components/admin/user-table'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 export default function AdminUsersPage() {
+  const t = useTranslations('admin')
+
   const [users, setUsers] = useState<UserProfile[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -56,10 +59,10 @@ export default function AdminUsersPage() {
     const res = await fetch(`/api/admin/users/${userId}/approve`, { method: 'POST' })
     const data = await res.json()
     if (!res.ok) {
-      toast.error(data.error || 'Failed to approve user')
+      toast.error(data.error || t('approveError'))
       return
     }
-    toast.success('User approved successfully')
+    toast.success(t('userApproved'))
     await fetchUsers()
   }
 
@@ -71,10 +74,10 @@ export default function AdminUsersPage() {
     })
     const data = await res.json()
     if (!res.ok) {
-      toast.error(data.error || 'Failed to reject user')
+      toast.error(data.error || t('rejectError'))
       return
     }
-    toast.success('User rejected')
+    toast.success(t('userRejected'))
     await fetchUsers()
   }
 
@@ -82,10 +85,10 @@ export default function AdminUsersPage() {
     const res = await fetch(`/api/admin/users/${userId}/deactivate`, { method: 'POST' })
     const data = await res.json()
     if (!res.ok) {
-      toast.error(data.error || 'Failed to deactivate user')
+      toast.error(data.error || t('deactivateError'))
       return
     }
-    toast.success('User deactivated')
+    toast.success(t('userDeactivated'))
     await fetchUsers()
   }
 
@@ -93,10 +96,10 @@ export default function AdminUsersPage() {
     const res = await fetch(`/api/admin/users/${userId}/reactivate`, { method: 'POST' })
     const data = await res.json()
     if (!res.ok) {
-      toast.error(data.error || 'Failed to reactivate user')
+      toast.error(data.error || t('reactivateError'))
       return
     }
-    toast.success('User reactivated')
+    toast.success(t('userReactivated'))
     await fetchUsers()
   }
 
@@ -108,10 +111,10 @@ export default function AdminUsersPage() {
     })
     const data = await res.json()
     if (!res.ok) {
-      toast.error(data.error || 'Failed to change role')
+      toast.error(data.error || t('roleChangeError'))
       return
     }
-    toast.success('Role updated successfully')
+    toast.success(t('roleUpdated'))
     await fetchUsers()
   }
 
