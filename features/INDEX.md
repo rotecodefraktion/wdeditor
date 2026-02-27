@@ -22,7 +22,7 @@
 | PROJ-7 | GitHub Repository Integration (Lesen/Committen) | In Review | [PROJ-7-github-integration.md](PROJ-7-github-integration.md) | 2026-02-20 |
 | PROJ-8 | UI Modernization — Consolut Branding | Deployed | [PROJ-8-ui-modernization-consolut-branding.md](PROJ-8-ui-modernization-consolut-branding.md) | 2026-02-25 |
 | PROJ-9 | Internationalization (i18n) — DE / EN / PT | Planned | [PROJ-9-internationalization.md](PROJ-9-internationalization.md) | 2026-02-27 |
-| PROJ-10 | Port-Kommentare im Instance Profile Editor | In Progress | [PROJ-10-port-comments.md](PROJ-10-port-comments.md) | 2026-02-27 |
+| PROJ-10 | Port-Kommentare im Instance Profile Editor | Deployed | [PROJ-10-port-comments.md](PROJ-10-port-comments.md) | 2026-02-27 |
 
 <!-- Add features above this line -->
 

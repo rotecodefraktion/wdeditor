@@ -1,8 +1,14 @@
 # PROJ-10: Port-Kommentare im Instance Profile Editor
 
-## Status: In Progress
+## Status: Deployed
 **Created:** 2026-02-27
-**Last Updated:** 2026-02-27
+**Last Updated:** 2026-02-27 (Deployed locally on port 3002)
+
+## Deployment
+
+- **Target:** Local (http://localhost:3002)
+- **Deployed:** 2026-02-27
+- **Commit:** 6297f0c (feat(PROJ-10): Add port comment support)
 
 ## Dependencies
 - Requires: PROJ-5 (Instance Profile Port Editor) — baut direkt auf dem bestehenden Port-Editor auf
