@@ -4,12 +4,12 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import type { LucideIcon } from 'lucide-react'
+import type { ReactNode } from 'react'
 
 interface FeatureCardProps {
   title: string
   description: string
-  icon: LucideIcon
+  icon: ReactNode
   href: string
   status: string
   enabled: boolean
@@ -18,7 +18,7 @@ interface FeatureCardProps {
 export function FeatureCard({
   title,
   description,
-  icon: Icon,
+  icon,
   href,
   status,
   enabled,
@@ -35,7 +35,7 @@ export function FeatureCard({
       <div className="p-6 pb-2">
         <div className="flex items-center justify-between">
           <div className="w-12 h-12 rounded-md bg-red-50 dark:bg-red-950/30 flex items-center justify-center text-consolut-red">
-            <Icon className="h-5 w-5" />
+            {icon}
           </div>
           <Badge variant={enabled ? 'default' : 'secondary'}>{status}</Badge>
         </div>

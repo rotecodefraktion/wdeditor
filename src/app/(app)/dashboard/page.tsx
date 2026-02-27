@@ -8,7 +8,7 @@ const features = [
   {
     title: 'Instance Profile Port Editor',
     description: 'Manage icm/server_port_* parameters with validation and conflict detection.',
-    icon: Settings,
+    icon: <Settings className="h-5 w-5" />,
     href: '/editor/instance-profile',
     status: 'Available',
     enabled: true,
@@ -16,7 +16,7 @@ const features = [
   {
     title: 'Rules.txt Rewrite Editor',
     description: 'Edit URL rewrite rules for routing and redirection.',
-    icon: FileText,
+    icon: <FileText className="h-5 w-5" />,
     href: '/editor/rules',
     status: 'Available',
     enabled: true,
@@ -24,7 +24,7 @@ const features = [
   {
     title: 'User Management',
     description: 'Approve or reject user access requests and manage team members.',
-    icon: Users,
+    icon: <Users className="h-5 w-5" />,
     href: '/admin/users',
     status: 'Available',
     enabled: true,
