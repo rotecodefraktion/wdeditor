@@ -67,6 +67,10 @@ const portFormSchema = z.object({
   vclient: z.string().optional(),
   sslconfig: z.string().optional(),
   extraParams: z.string().optional(),
+  comment: z
+    .string()
+    .max(200, 'Kommentar darf maximal 200 Zeichen lang sein')
+    .optional(),
 })
 
 export type PortFormValues = z.infer<typeof portFormSchema>
@@ -90,6 +94,7 @@ export function PortForm({
       vclient: '',
       sslconfig: '',
       extraParams: '',
+      comment: '',
     },
   })
 
@@ -107,6 +112,7 @@ export function PortForm({
           vclient: entry.vclient || '',
           sslconfig: entry.sslconfig || '',
           extraParams: formatExtraParams(entry.extraParams),
+          comment: (entry.comment || '').slice(0, 200),
         })
       } else if (mode === 'duplicate' && entry) {
         form.reset({
@@ -117,6 +123,7 @@ export function PortForm({
           vclient: entry.vclient || '',
           sslconfig: entry.sslconfig || '',
           extraParams: formatExtraParams(entry.extraParams),
+          comment: (entry.comment || '').slice(0, 200), // Copy comment for duplication
         })
       } else {
         form.reset({
@@ -127,6 +134,7 @@ export function PortForm({
           vclient: '',
           sslconfig: '',
           extraParams: '',
+          comment: '',
         })
       }
     }
@@ -163,10 +171,11 @@ export function PortForm({
       }
     }
 
-    // Sanitize extraParams: strip newlines to prevent injection into config file
+    // Sanitize extraParams and comment: strip newlines to prevent injection into config file
     const sanitizedValues = {
       ...values,
       extraParams: values.extraParams?.replace(/[\n\r\0]/g, '') ?? '',
+      comment: values.comment?.replace(/[\n\r\0]/g, '').trim() || '',
     }
 
     onSubmit(sanitizedValues, mode)
@@ -340,6 +349,33 @@ export function PortForm({
                   </FormControl>
                   <FormDescription>
                     Komma-getrennt im Format KEY=VALUE. Bekannte Schluessel: EXTBIND, NOLISTEN, PROCTIMEOUT, KEEPALIVE.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Comment */}
+            <FormField
+              control={form.control}
+              name="comment"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Kommentar</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="z.B. Externer HTTP-Eingang fuer Load Balancer"
+                      maxLength={200}
+                      {...field}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Optional. Wird als # Kommentar vor dem Port-Eintrag in der Datei gespeichert (max. 200 Zeichen).
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

@@ -286,6 +286,11 @@ export default function InstanceProfileEditorPage() {
     ])
     const unknownKeys = Object.keys(extraParams).filter((k) => !knownSet.has(k))
 
+    // Sanitize comment: trim whitespace (parser already strips the file-level # prefix)
+    const comment = values.comment
+      ? values.comment.trim()
+      : ''
+
     if (mode === 'edit' && formEntry) {
       // Update existing entry
       setPortEntries((prev) =>
@@ -302,6 +307,7 @@ export default function InstanceProfileEditorPage() {
                 extraParams,
                 unknownKeys,
                 rawLine: null,
+                comment: comment || undefined,
               }
             : e
         )
@@ -331,6 +337,7 @@ export default function InstanceProfileEditorPage() {
         sslconfig: values.prot === 'HTTPS' ? values.sslconfig || '' : '',
         extraParams,
         unknownKeys,
+        comment: comment || undefined,
       }
       setPortEntries((prev) => [...prev, newEntry])
     }
@@ -429,6 +436,57 @@ export default function InstanceProfileEditorPage() {
     nonPortLines,
     lineMap
   )
+
+  // Compute a smart default commit message based on what changed
+  function getDefaultCommitMessage(): string {
+    const timestamp = new Date().toISOString().slice(0, 16).replace('T', ' ')
+    const originalParsed = parseInstanceProfile(originalContent)
+
+    const origMap = new Map(originalParsed.portEntries.map((e) => [e.index, e]))
+    const currMap = new Map(portEntries.map((e) => [e.index, e]))
+
+    const added: number[] = []
+    const deleted: number[] = []
+    const commentChanged: number[] = []
+    let paramsChanged = false
+
+    // Check for deleted ports
+    for (const [idx] of origMap) {
+      if (!currMap.has(idx)) deleted.push(origMap.get(idx)!.port ?? idx)
+    }
+
+    // Check for added and modified ports
+    for (const [idx, curr] of currMap) {
+      const orig = origMap.get(idx)
+      if (!orig) {
+        added.push(curr.port ?? idx)
+      } else {
+        // Check if only comment changed
+        const commentDiff = (orig.comment || '') !== (curr.comment || '')
+        const paramsDiff =
+          orig.prot !== curr.prot ||
+          orig.port !== curr.port ||
+          orig.timeout !== curr.timeout ||
+          orig.host !== curr.host ||
+          orig.vclient !== curr.vclient ||
+          orig.sslconfig !== curr.sslconfig ||
+          JSON.stringify(orig.extraParams) !== JSON.stringify(curr.extraParams)
+
+        if (paramsDiff) paramsChanged = true
+        if (commentDiff && !paramsDiff) commentChanged.push(curr.port ?? idx)
+      }
+    }
+
+    // Build specific message
+    if (!paramsChanged && commentChanged.length > 0 && added.length === 0 && deleted.length === 0) {
+      if (commentChanged.length === 1) {
+        return `feat: Update comment for port ${commentChanged[0]} [${timestamp}]`
+      }
+      return `feat: Update comments for ports ${commentChanged.join(', ')} [${timestamp}]`
+    }
+
+    return `feat: Update icm/server_port configuration [${timestamp}]`
+  }
 
   // ─── Render ───────────────────────────────────────────────────
 
@@ -596,7 +654,7 @@ export default function InstanceProfileEditorPage() {
         currentSha={currentSha}
         fileType="instance_profile"
         fileName={filePath}
-        defaultMessage={`feat: Update icm/server_port configuration [${new Date().toISOString().slice(0, 16).replace('T', ' ')}]`}
+        defaultMessage={getDefaultCommitMessage()}
         onCommitSuccess={handleCommitSuccess}
       />
     </div>
