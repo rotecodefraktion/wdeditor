@@ -2,9 +2,12 @@
 
 ## Core Checklist
 - [ ] Checked existing tables/APIs via git before creating new ones
-- [ ] Database tables created in Supabase
+- [ ] Database migrations applied to live database via MCP tools (e.g. `apply_migration`) — local SQL files alone are NOT sufficient
+- [ ] `list_tables` confirms ALL new tables exist in the database
+- [ ] `list_migrations` output matches all local migration files (no drift)
 - [ ] Row Level Security enabled on ALL new tables
 - [ ] RLS policies created for SELECT, INSERT, UPDATE, DELETE
+- [ ] Test query via `execute_sql` confirms tables are accessible and RLS works
 - [ ] Indexes created on performance-critical columns
 - [ ] Foreign keys set with appropriate ON DELETE behavior
 - [ ] All planned API endpoints implemented in `/src/app/api/`
@@ -21,6 +24,7 @@
 - [ ] `npm run build` passes without errors
 - [ ] All acceptance criteria from feature spec addressed in API
 - [ ] All API endpoints return correct status codes (test with curl or browser)
+- [ ] FINAL CHECK: `list_tables` + `list_migrations` confirm all database objects exist and all migrations are applied
 - [ ] `features/INDEX.md` status updated to "In Progress"
 - [ ] Code committed to git
 

@@ -1,8 +1,8 @@
 # PROJ-7: GitHub Repository Integration
 
-## Status: In Review
+## Status: Deployed
 **Created:** 2026-02-20
-**Last Updated:** 2026-02-20
+**Last Updated:** 2026-02-28
 
 ## Dependencies
 - Requires: PROJ-4 (Global Settings) – Repository-URL, PAT, Branch und Dateipfade müssen konfiguriert sein

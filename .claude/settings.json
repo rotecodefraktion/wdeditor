@@ -18,7 +18,14 @@
       "Bash(kill:*)",
       "Bash(npx shadcn@latest add:*)",
       "Bash(ls:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "mcp__supabase__get_logs",
+      "Bash(python3:*)",
+      "mcp__supabase__list_projects",
+      "mcp__supabase__list_tables"
+    ],
+    "additionalDirectories": [
+      "/Users/davidkrcek/development/consolut/wdeditor"
     ]
   }
 }

@@ -1,8 +1,8 @@
 # PROJ-1: User Registration & Approval Workflow
 
-## Status: In Review
+## Status: Deployed
 **Created:** 2026-02-20
-**Last Updated:** 2026-02-20
+**Last Updated:** 2026-02-28
 
 ## Dependencies
 - None (Basis-Feature)

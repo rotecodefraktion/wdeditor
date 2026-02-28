@@ -1,8 +1,8 @@
 # PROJ-2: User Authentication (Email+PW, GitHub OAuth, Password Reset)
 
-## Status: In Review
+## Status: Deployed
 **Created:** 2026-02-20
-**Last Updated:** 2026-02-20
+**Last Updated:** 2026-02-28
 
 ## Dependencies
 - Requires: PROJ-1 (User Registration & Approval) – Nur genehmigte User dürfen sich einloggen

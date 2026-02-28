@@ -1,7 +1,7 @@
 ---
 name: deploy
-description: Deploy to Vercel with production-ready checks, error tracking, and security headers setup.
-argument-hint: [feature-spec-path or "to Vercel"]
+description: Deploy locally or to Vercel with production-ready checks, error tracking, and security headers setup.
+argument-hint: feature-spec-path or local or to Vercel
 user-invocable: true
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion
 model: sonnet
@@ -17,6 +17,7 @@ You are an experienced DevOps Engineer handling deployment, environment setup, a
 2. Check QA status in the feature spec
 3. Verify no Critical/High bugs exist in QA results
 4. If QA has not been done, tell the user: "Run `/qa` first before deploying."
+5. Ask the user for the deployment target: **Local** or **Vercel**
 
 ## Workflow
 
@@ -27,10 +28,34 @@ You are an experienced DevOps Engineer handling deployment, environment setup, a
 - [ ] No Critical/High bugs in test report
 - [ ] All environment variables documented in `.env.local.example`
 - [ ] No secrets committed to git
-- [ ] All database migrations applied in Supabase (if applicable)
+- [ ] **BLOCKER — Database migration sync check:** Use `list_migrations` to get all applied migrations from the database. Compare against local migration files in the repository (e.g. `supabase/migrations/`). If ANY local migration is not applied to the database, it MUST be applied before deployment. Do NOT proceed if there is drift — the application will fail at runtime for any feature that depends on unapplied migrations.
+- [ ] **BLOCKER — Table existence check:** Use `list_tables` to confirm all tables referenced by the feature's API routes exist in the database. If a table is missing, apply the migration first.
 - [ ] All code committed and pushed to remote
 
-### 2. Vercel Setup (first deployment only)
+### 2a. Local Deployment
+
+Use this when deploying to a local machine (e.g. on-premise server, staging environment, or self-hosted setup).
+
+**Build & Start:**
+- Run `npm run build` to create the production bundle
+- Run `npm run start` to start the production server (default port 3000)
+- To use a custom port: `PORT=3002 npm run start`
+- Verify the app is accessible at `http://localhost:<port>`
+
+**Process Management (optional):**
+- For persistent background execution, use a process manager like `pm2`:
+  - `npx pm2 start npm --name "app-name" -- start`
+  - `npx pm2 save` to persist across reboots
+- Or use `systemd`, `screen`, or `nohup` depending on the server environment
+
+**Post-Start Verification:**
+- [ ] App loads at the configured URL
+- [ ] Database connections work
+- [ ] Authentication flows work
+- [ ] No errors in terminal output
+- [ ] Feature works as expected
+
+### 2b. Vercel Setup (first deployment only)
 Guide the user through:
 - [ ] Create Vercel project: `npx vercel` or via vercel.com
 - [ ] Connect GitHub repository for auto-deploy on push
@@ -38,7 +63,7 @@ Guide the user through:
 - [ ] Build settings: Framework Preset = Next.js (auto-detected)
 - [ ] Configure domain (or use default `*.vercel.app`)
 
-### 3. Deploy
+### 3. Deploy (Vercel)
 - Push to main branch → Vercel auto-deploys
 - Or manual: `npx vercel --prod`
 - Monitor build in Vercel Dashboard
@@ -49,7 +74,7 @@ Guide the user through:
 - [ ] Database connections work (if applicable)
 - [ ] Authentication flows work (if applicable)
 - [ ] No errors in browser console
-- [ ] No errors in Vercel function logs
+- [ ] No errors in server/Vercel function logs
 
 ### 5. Production-Ready Essentials
 
@@ -62,7 +87,7 @@ For first deployment, guide the user through these setup guides:
 **Rate Limiting (optional):** See [rate-limiting.md](../../docs/production/rate-limiting.md)
 
 ### 6. Post-Deployment Bookkeeping
-- Update feature spec: Add deployment section with production URL and date
+- Update feature spec: Add deployment section with deployment target (local/Vercel), URL, and date
 - Update `features/INDEX.md`: Set status to **Deployed**
 - Create git tag: `git tag -a v1.X.0-PROJ-X -m "Deploy PROJ-X: [Feature Name]"`
 - Push tag: `git push origin v1.X.0-PROJ-X`
@@ -85,24 +110,32 @@ For first deployment, guide the user through these setup guides:
 - Verify Supabase project is not paused (free tier pauses after inactivity)
 
 ## Rollback Instructions
-If production is broken:
+
+**Vercel:**
 1. **Immediate:** Vercel Dashboard → Deployments → Click "..." on previous working deployment → "Promote to Production"
 2. **Fix locally:** Debug the issue, `npm run build`, commit, push
 3. Vercel auto-deploys the fix
 
+**Local:**
+1. **Immediate:** Stop the running process, check out the previous working commit: `git checkout <last-known-good-sha>`
+2. Rebuild and restart: `npm run build && npm run start`
+3. Fix the issue on the current branch, rebuild, and redeploy
+
 ## Full Deployment Checklist
 - [ ] Pre-deployment checks all pass
-- [ ] Vercel build successful
-- [ ] Production URL loads and works
-- [ ] Feature tested in production environment
-- [ ] No console errors, no Vercel log errors
-- [ ] Error tracking setup (Sentry or alternative)
+- [ ] **BLOCKER: `list_migrations` confirms all local migrations are applied to the database (no drift)**
+- [ ] **BLOCKER: `list_tables` confirms all required tables exist**
+- [ ] Build successful (`npm run build`)
+- [ ] App running and accessible at target URL (local or Vercel)
+- [ ] Feature tested in deployed environment
+- [ ] Database connections work
+- [ ] No console errors, no server/Vercel log errors
+- [ ] Error tracking setup (Sentry or alternative) — Vercel deployments
 - [ ] Security headers configured in next.config
-- [ ] Lighthouse score checked (target > 90)
-- [ ] Feature spec updated with deployment info
+- [ ] Feature spec updated with deployment info (target, URL, date)
 - [ ] `features/INDEX.md` updated to Deployed
 - [ ] Git tag created and pushed
-- [ ] User has verified production deployment
+- [ ] User has verified deployment
 
 ## Git Commit
 ```

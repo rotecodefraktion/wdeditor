@@ -13,13 +13,13 @@
 
 | ID | Feature | Status | Spec | Created |
 | -- | ------- | ------ | ---- | ------- |
-| PROJ-1 | User Registration & Approval Workflow | In Review | [PROJ-1-user-registration-approval.md](PROJ-1-user-registration-approval.md) | 2026-02-20 |
-| PROJ-2 | User Authentication (Email+PW, GitHub OAuth, Password Reset) | In Review | [PROJ-2-user-authentication.md](PROJ-2-user-authentication.md) | 2026-02-20 |
-| PROJ-3 | Admin User Management Dashboard | In Review | [PROJ-3-admin-user-management.md](PROJ-3-admin-user-management.md) | 2026-02-20 |
-| PROJ-4 | Global Settings (GitHub Repo, Dateipfade, Dev Branch) | In Review | [PROJ-4-global-settings.md](PROJ-4-global-settings.md) | 2026-02-20 |
+| PROJ-1 | User Registration & Approval Workflow | Deployed | [PROJ-1-user-registration-approval.md](PROJ-1-user-registration-approval.md) | 2026-02-20 |
+| PROJ-2 | User Authentication (Email+PW, GitHub OAuth, Password Reset) | Deployed | [PROJ-2-user-authentication.md](PROJ-2-user-authentication.md) | 2026-02-20 |
+| PROJ-3 | Admin User Management Dashboard | Deployed | [PROJ-3-admin-user-management.md](PROJ-3-admin-user-management.md) | 2026-02-20 |
+| PROJ-4 | Global Settings (GitHub Repo, Dateipfade, Dev Branch) | Deployed | [PROJ-4-global-settings.md](PROJ-4-global-settings.md) | 2026-02-20 |
 | PROJ-5 | Instance Profile Port Editor (inkl. Pessimistic Locking) | Deployed | [PROJ-5-instance-profile-port-editor.md](PROJ-5-instance-profile-port-editor.md) | 2026-02-20 |
 | PROJ-6 | Rules.txt Rewrite Rule Editor (inkl. Pessimistic Locking) | Deployed | [PROJ-6-rules-rewrite-editor.md](PROJ-6-rules-rewrite-editor.md) | 2026-02-20 |
-| PROJ-7 | GitHub Repository Integration (Lesen/Committen) | In Review | [PROJ-7-github-integration.md](PROJ-7-github-integration.md) | 2026-02-20 |
+| PROJ-7 | GitHub Repository Integration (Lesen/Committen) | Deployed | [PROJ-7-github-integration.md](PROJ-7-github-integration.md) | 2026-02-20 |
 | PROJ-8 | UI Modernization — Consolut Branding | Deployed | [PROJ-8-ui-modernization-consolut-branding.md](PROJ-8-ui-modernization-consolut-branding.md) | 2026-02-25 |
 | PROJ-9 | Internationalization (i18n) — DE / EN / PT | Deployed | [PROJ-9-internationalization.md](PROJ-9-internationalization.md) | 2026-02-27 |
 | PROJ-10 | Port-Kommentare im Instance Profile Editor | Deployed | [PROJ-10-port-comments.md](PROJ-10-port-comments.md) | 2026-02-27 |

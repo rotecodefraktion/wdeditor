@@ -54,6 +54,12 @@ If no design specs exist, ask the user:
 - Set up routing if needed
 - Connect to backend APIs or localStorage as specified in tech design
 
+**CRITICAL — No Silent Error Swallowing:**
+- Every `fetch()` call MUST handle the `!res.ok` case with visible user feedback (toast, alert, banner, or error state). A `fetch()` without an error branch is a bug.
+- If a feature's core functionality depends on an API call (e.g. acquiring a resource, loading configuration), the UI MUST show a clear error state when that call fails — not silently degrade to a reduced/read-only mode.
+- Never hide UI elements (buttons, forms, actions) without showing the user WHY they are hidden. If functionality is unavailable, display an explanation.
+- All components that consume API data must implement ALL states: loading, success, error, empty, and any domain-specific states (e.g. locked, unauthorized, unavailable).
+
 ### 6. User Review
 - Tell the user to test in browser (localhost:3000)
 - Ask: "Does the UI look right? Any changes needed?"

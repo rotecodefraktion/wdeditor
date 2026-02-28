@@ -1,8 +1,8 @@
 # PROJ-3: Admin User Management Dashboard
 
-## Status: In Review
+## Status: Deployed
 **Created:** 2026-02-20
-**Last Updated:** 2026-02-20
+**Last Updated:** 2026-02-28
 
 ## Dependencies
 - Requires: PROJ-1 (User Registration & Approval) – für User-Status-Modell

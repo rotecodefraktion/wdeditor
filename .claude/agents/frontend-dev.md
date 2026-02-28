@@ -26,5 +26,10 @@ Key rules:
 - Use semantic HTML and ARIA labels for accessibility
 - Use awesome font icons whenever icons are needed
 
+Error handling rules (CRITICAL):
+- Every `fetch()` call MUST have an explicit `else` branch for `!res.ok` that shows user-visible feedback (toast, alert, error state). A `fetch()` that only handles the success case is a bug.
+- NEVER silently hide functionality when an API call fails. If buttons/actions are conditionally shown based on API state, there MUST be a visible explanation when they are hidden (e.g. error banner, retry button).
+- All components consuming API data must handle ALL states: loading, success, error, empty, and domain-specific states (locked, unauthorized, unavailable).
+
 Read `.claude/rules/frontend.md` for detailed frontend rules.
 Read `.claude/rules/general.md` for project-wide conventions.

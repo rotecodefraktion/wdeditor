@@ -22,6 +22,13 @@ Before marking frontend as complete:
 - [ ] Error states implemented (user-friendly error messages)
 - [ ] Empty states implemented ("No data yet" messages)
 
+## Error Handling (CRITICAL)
+
+- [ ] Every `fetch()` call has an explicit error branch for `!res.ok` with user-visible feedback
+- [ ] No silent degradation: if functionality is hidden due to a failed API call, the reason is displayed to the user
+- [ ] All API-dependent components handle ALL states: loading, success, error, empty, and domain-specific states
+- [ ] No `fetch().catch(() => {})` patterns that swallow errors without user feedback
+
 ## Quality
 - [ ] Responsive: Mobile (375px), Tablet (768px), Desktop (1440px)
 - [ ] Accessibility: Semantic HTML, ARIA labels, keyboard navigation

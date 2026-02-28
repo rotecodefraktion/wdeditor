@@ -35,11 +35,18 @@ Use `AskUserQuestion` for:
 - What specific input validations are required?
 
 ### 3. Create Database Schema
-- Write SQL for new tables in Supabase SQL Editor
+- Write SQL for new tables
 - Enable Row Level Security on EVERY table
 - Create RLS policies for all CRUD operations
 - Add indexes on performance-critical columns (WHERE, ORDER BY, JOIN)
 - Use foreign keys with ON DELETE CASCADE where appropriate
+
+**CRITICAL — Apply & Verify Migrations:**
+- ALWAYS apply migrations directly to the database using MCP tools (e.g. `apply_migration`). Writing a local SQL file alone is NOT sufficient — the migration must be executed against the live database.
+- After applying, verify with `list_tables` that all new tables actually exist.
+- Run a test query via `execute_sql` (e.g. `SELECT count(*) FROM new_table`) to confirm the table is accessible and RLS policies work.
+- Compare local migration files against applied migrations (`list_migrations`) to ensure they are in sync.
+- If a migration fails, fix the issue and re-apply — do NOT proceed with API development against a non-existent table.
 
 ### 4. Create API Routes
 - Create route handlers in `/src/app/api/`
@@ -53,8 +60,15 @@ Use `AskUserQuestion` for:
 - Replace any mock data or localStorage with API calls
 - Handle loading and error states
 
-### 6. User Review
+### 6. Final Verification
+Before presenting results to the user:
+- Run `list_tables` and confirm ALL tables required by this feature exist in the database
+- Run `list_migrations` and confirm ALL local migration files have been applied
+- If any migration is missing, apply it NOW — do not proceed to handoff
+
+### 7. User Review
 - Walk user through the API endpoints created
+- Show proof that tables exist (list_tables output)
 - Ask: "Do the APIs work correctly? Any edge cases to test?"
 
 ## Context Recovery
@@ -94,8 +108,8 @@ CREATE INDEX idx_tasks_status ON tasks(status);
 See [checklist.md](checklist.md) for the full implementation checklist.
 
 ## Handoff
-After completion:
-> "Backend is done! Next step: Run `/qa` to test this feature against its acceptance criteria."
+After completion, include the verification proof in the handoff message:
+> "Backend is done! All migrations applied and verified (X tables confirmed via list_tables). Next step: Run `/qa` to test this feature against its acceptance criteria."
 
 ## Git Commit
 ```

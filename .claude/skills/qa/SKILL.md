@@ -31,7 +31,27 @@ You are an experienced QA Engineer AND Red-Team Pen-Tester. You test features ag
 - Understand the tech design decisions
 - Note any dependencies on other features
 
-### 2. Manual Testing
+### 2. Infrastructure Verification (BEFORE Code Review)
+
+Before reading any implementation code, verify that the infrastructure the feature depends on actually exists. This catches deployment gaps early.
+
+**Database Check:**
+- Use `list_tables` to confirm all tables referenced by the feature exist in the database
+- Use `list_migrations` to compare applied migrations against local migration files in the repository
+- If ANY migration file exists locally but is NOT applied to the database, flag this as a **Critical** bug immediately — the feature cannot work without its tables
+- Use `get_advisors` (security + performance) to check for missing RLS policies or other database issues
+
+**Build Check:**
+- Run `npm run build` — if it fails, flag as Critical before proceeding
+- Check for server-side errors in build output that indicate missing dependencies or configuration
+
+**Error Handling Audit:**
+- Search the codebase for `fetch(` calls in the feature's files
+- Verify every `fetch()` has an explicit error branch for `!res.ok` with user-visible feedback
+- Flag any `fetch()` that only handles the success path as a **High** severity bug — silent failures hide broken features from users
+- Check for `.catch(() => {})` patterns that swallow errors without feedback
+
+### 3. Manual Testing
 
 Test the feature systematically in the browser:
 
@@ -106,13 +126,38 @@ If your context was compacted mid-task:
 
 ## Checklist
 
-- [ ] Feature spec fully read and understood
+### Infrastructure Verification (do this FIRST)
+
+- [ ] `list_tables` confirms all tables required by this feature exist in the database
+- [ ] `list_migrations` output compared against local migration files — no drift detected
+- [ ] If drift found: flagged as **Critical** bug (feature cannot work without its database objects)
+- [ ] `get_advisors` (security) checked — no missing RLS policies on feature tables
+- [ ] `npm run build` passes without errors
+
+### Error Handling Audit
+
+- [ ] All `fetch()` calls in feature code have explicit `!res.ok` handling with user-visible feedback
+- [ ] No silent degradation patterns (hiding UI without explanation when API fails)
+- [ ] No `.catch(() => {})` patterns that swallow errors silently
+
+### Functional Testing
+
 - [ ] All acceptance criteria tested (each has pass/fail)
 - [ ] All documented edge cases tested
 - [ ] Additional edge cases identified and tested
 - [ ] Cross-browser tested (Chrome, Firefox, Safari)
 - [ ] Responsive tested (375px, 768px, 1440px)
+
+### Security Audit
+
 - [ ] Security audit completed (red-team perspective)
+- [ ] SQL Injection prevention verified
+- [ ] XSS protection checked
+- [ ] CSRF tokens implemented
+- [ ] Rate limiting configured
+
+### Regression & Reporting
+
 - [ ] Regression test on related features
 - [ ] Every bug documented with severity + steps to reproduce
 - [ ] Screenshots added for visual bugs
@@ -120,15 +165,6 @@ If your context was compacted mid-task:
 - [ ] User has reviewed results and prioritized bugs
 - [ ] Production-ready decision made
 - [ ] `features/INDEX.md` status updated to "In Review"
-
-## Additional Security Checks
-
-Before marking feature as READY:
-
-- [ ] SQL Injection prevention verified
-- [ ] XSS protection checked
-- [ ] CSRF tokens implemented
-- [ ] Rate limiting configured
 
 ## Handoff
 
