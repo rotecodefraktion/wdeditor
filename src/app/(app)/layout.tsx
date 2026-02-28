@@ -1,12 +1,14 @@
-import Link from 'next/link'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { Button } from '@/components/ui/button'
-import { LogOut, Settings } from 'lucide-react'
+import { LogOut } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { MobileNav } from '@/components/mobile-nav'
 import { getTranslations } from 'next-intl/server'
+import { cookies } from 'next/headers'
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
+import { AppSidebar } from '@/components/app-sidebar'
+import { Separator } from '@/components/ui/separator'
 
 async function SignOutButton() {
   const t = await getTranslations('common')
@@ -40,58 +42,43 @@ export default async function AppLayout({
     .single()
 
   const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin'
+  const userRole = profile?.role ?? 'user'
+
+  // Read sidebar state from cookie for server-side default
+  const cookieStore = await cookies()
+  const sidebarCookie = cookieStore.get('sidebar_state')
+  const defaultOpen = sidebarCookie?.value !== 'false'
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <header className="border-b">
-        <div className="container mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <MobileNav isAdmin={isAdmin} />
-            <Link href="/dashboard" className="flex flex-col items-start">
-              <span className="text-lg font-black text-consolut-dark dark:text-white leading-tight">consolut</span>
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-consolut-red">WD EDITOR</span>
-            </Link>
-            <nav className="hidden md:flex items-center gap-4">
-              <Link href="/dashboard" className="uppercase tracking-wider text-xs font-bold text-gray-400 hover:text-foreground transition-colors">
-                {t('dashboard')}
-              </Link>
-              <Link href="/editor/instance-profile" className="uppercase tracking-wider text-xs font-bold text-gray-400 hover:text-foreground transition-colors">
-                {t('portEditor')}
-              </Link>
-              <Link href="/editor/rules" className="uppercase tracking-wider text-xs font-bold text-gray-400 hover:text-foreground transition-colors">
-                {t('rulesEditor')}
-              </Link>
-              {isAdmin && (
-                <>
-                  <Link href="/admin/users" className="uppercase tracking-wider text-xs font-bold text-gray-400 hover:text-foreground transition-colors">
-                    {t('users')}
-                  </Link>
-                  <Link href="/settings" className="uppercase tracking-wider text-xs font-bold text-gray-400 hover:text-foreground transition-colors flex items-center gap-1">
-                    <Settings className="h-3.5 w-3.5" />
-                    {t('settings')}
-                  </Link>
-                </>
-              )}
-            </nav>
+    <SidebarProvider defaultOpen={defaultOpen}>
+      <AppSidebar
+        isAdmin={isAdmin}
+        userEmail={user.email ?? ''}
+        userRole={userRole}
+      />
+      <SidebarInset className="min-h-svh flex flex-col">
+        <header className="flex h-12 shrink-0 items-center justify-between border-b px-4">
+          <div className="flex items-center gap-2">
+            <SidebarTrigger aria-label={t('openNavigation')} />
+            <Separator orientation="vertical" className="h-4" />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground hidden sm:block">
-              {user.email}
-            </span>
             <LanguageSwitcher />
             <ThemeToggle />
             <SignOutButton />
           </div>
+        </header>
+        <div className="flex-1 px-4 py-6 md:px-6">
+          {children}
         </div>
-      </header>
-      <main className="flex-1 container mx-auto px-4 py-6">{children}</main>
-      <footer className="border-t py-4">
-        <div className="container mx-auto px-4">
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">
-            {t('footer')}
-          </p>
-        </div>
-      </footer>
-    </div>
+        <footer className="shrink-0 border-t py-4">
+          <div className="px-4 md:px-6">
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">
+              {t('footer')}
+            </p>
+          </div>
+        </footer>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

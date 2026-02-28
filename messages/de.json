@@ -438,6 +438,10 @@
     "noGithubUsername": "Ihr Benutzerprofil hat keinen GitHub-Username hinterlegt. Bitte den Admin kontaktieren.",
     "noRepoAccessDescription": "Ihr GitHub-Account ({username}) hat keinen Zugriff auf das Repository -- bitte den Admin kontaktieren."
   },
+  "sidebar": {
+    "navigation": "Navigation",
+    "administration": "Administration"
+  },
   "language": {
     "label": "Sprache",
     "de": "Deutsch",

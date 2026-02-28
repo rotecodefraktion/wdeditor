@@ -28,6 +28,7 @@ Der SAP Web Dispatcher Config Editor ist ein webbasiertes Tool für SAP-Basis-Ad
 | P1 | PROJ-8: UI Modernization — Consolut Branding | Planned |
 | P1 | PROJ-9: Internationalization (i18n) — DE / EN / PT | Planned |
 | P1 | PROJ-10: Port-Kommentare im Instance Profile Editor | Planned |
+| P1 | PROJ-11: Collapsible Sidebar Navigation & SVG Logo | Planned |
 
 ## Success Metrics
 

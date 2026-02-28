@@ -438,6 +438,10 @@
     "noGithubUsername": "Seu perfil de usuario nao tem nome de usuario GitHub. Entre em contato com o admin.",
     "noRepoAccessDescription": "Sua conta GitHub ({username}) nao tem acesso ao repositorio -- entre em contato com o admin."
   },
+  "sidebar": {
+    "navigation": "Navegacao",
+    "administration": "Administracao"
+  },
   "language": {
     "label": "Idioma",
     "de": "Deutsch",

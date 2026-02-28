@@ -23,10 +23,11 @@
 | PROJ-8 | UI Modernization — Consolut Branding | Deployed | [PROJ-8-ui-modernization-consolut-branding.md](PROJ-8-ui-modernization-consolut-branding.md) | 2026-02-25 |
 | PROJ-9 | Internationalization (i18n) — DE / EN / PT | Deployed | [PROJ-9-internationalization.md](PROJ-9-internationalization.md) | 2026-02-27 |
 | PROJ-10 | Port-Kommentare im Instance Profile Editor | Deployed | [PROJ-10-port-comments.md](PROJ-10-port-comments.md) | 2026-02-27 |
+| PROJ-11 | Collapsible Sidebar Navigation & SVG Logo | Deployed | [PROJ-11-collapsible-sidebar.md](PROJ-11-collapsible-sidebar.md) | 2026-02-28 |
 
 <!-- Add features above this line -->
 
-## Next Available ID: PROJ-11
+## Next Available ID: PROJ-12
 
 ## Build Order (Empfohlen)
 
